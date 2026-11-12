@@ -299,7 +299,8 @@ const stage = $('.hero__stage');
 const posterLayer = $('.hero__poster');
 const cue = $('.hero__cue');
 const ring = $('.ring', cue);
-const POSTER_URL = 'assets/frames/f001.webp';   // frame one doubles as the poster (29 KB)
+const PHONE_FILM = matchMedia('(max-width: 720px), (orientation: portrait)').matches;   // portrait-cropped film for phones
+const POSTER_URL = (PHONE_FILM ? 'assets/frames-m/' : 'assets/frames/') + 'f001.webp';   // frame one doubles as the poster
 
 const bands = $$('.band').map((el, i, arr) => {
   const [a, b] = el.dataset.band.split(',').map(Number);
@@ -333,22 +334,25 @@ function updateCaptions(p) {
   if (cue.classList.contains('is-gone') !== gone) cue.classList.toggle('is-gone', gone);
 }
 
-/* Frame-sequence scrub: the hero film is 121 small WebP stills painted on a canvas.
-   Coarse-to-fine loading means scrolling works within seconds on slow connections,
-   and drawing a decoded image is far cheaper than seeking a video. */
+/* Frame-sequence scrub: the hero film is 121 WebP stills painted on a canvas.
+   Phones get a portrait set cropped on the chef and the steak; laptops get the standard set.
+   Measured on Intel UHD 620: 1280px frames with default scaling hold 59 fps at 1920x1080,
+   while 1600/1920px frames or high-quality scaling drop to 35-53 fps. */
 const FRAME_COUNT = 121;
-const frameSrc = i => `assets/frames/f${String(i + 1).padStart(3, '0')}.webp`;
+let frameDir = PHONE_FILM ? 'frames-m' : 'frames';
+const frameSrc = (i, dir) => `assets/${dir}/f${String(i + 1).padStart(3, '0')}.webp`;
 const frames = new Array(FRAME_COUNT);
 const loaded = new Uint8Array(FRAME_COUNT);
 const canvas = $('.hero__canvas');
 const cx = canvas.getContext('2d', { alpha: false });
+
 let cw = 0, ch = 0, drawnIdx = -1, firstReady = false, loadedCount = 0;
 
 function sizeCanvas() {
-  const dpr = Math.min(innerWidth <= 900 ? 2 : 1, devicePixelRatio || 1);
+  const dpr = Math.min(PHONE_FILM ? 2 : 1.25, devicePixelRatio || 1);
   const r = stage.getBoundingClientRect();
   const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
-  if (w && h && (canvas.width !== w || canvas.height !== h)) { canvas.width = cw = w; canvas.height = ch = h; drawnIdx = -1; draw(shown); }
+  if (w && h && (canvas.width !== w || canvas.height !== h)) { canvas.width = cw = w; canvas.height = ch = h;  drawnIdx = -1; draw(shown); }
 }
 function nearestLoaded(i) {
   if (loaded[i]) return i;
@@ -366,28 +370,29 @@ function draw(p) {
   const img = frames[i];
   const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
   const w = img.naturalWidth * s, h = img.naturalHeight * s;
-  cx.drawImage(img, (cw - w) * (cw < ch ? 0.62 : 0.5), (ch - h) / 2, w, h);
+  cx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
   drawnIdx = i;
 }
 
 /* coarse-to-fine order: frames 0, 30, 60, 90, 120 first, then every 15th, 8th, 4th, 2nd, then all */
-let FIRST_PASS = 0, STEP4_END = 0;
+let FIRST_PASS = 0, STEP4_END = 0, STEP2_END = 0;
 const ORDER = (() => {
   const seen = new Uint8Array(FRAME_COUNT), out = [];
   for (const step of [30, 15, 8, 4, 2, 1]) {
     for (let i = 0; i < FRAME_COUNT; i += step) if (!seen[i]) { seen[i] = 1; out.push(i); }
     if (!FIRST_PASS) FIRST_PASS = out.length;
     if (step === 4) STEP4_END = out.length;
+    if (step === 2) STEP2_END = out.length;
   }
   return out;
 })();
 
 function measureSpeed() {
-  const rs = performance.getEntriesByType('resource').filter(r => r.name.includes('/frames/') && r.responseEnd > 0 && r.responseStart > 0);
+  const rs = performance.getEntriesByType('resource').filter(r => /\/frames(-m|-hd)?\//.test(r.name) && r.responseEnd > 0 && r.responseStart > 0);
   if (rs.length < 3) return;
   const bytes = rs.reduce((s, r) => s + (r.encodedBodySize || r.transferSize || 27000), 0);
   // count only the time when bytes were actually arriving (merged transfer windows), not queueing or script waits
-  const spans = rs.map(r => [r.responseStart, r.responseEnd]).sort((a, b) => a[0] - b[0]);
+  const spans = rs.map(r => [r.responseStart, r.responseEnd]).sort((x, y) => x[0] - y[0]);
   let busy = 0, [s0, e0] = spans[0];
   for (const [s, e] of spans.slice(1)) { if (s > e0) { busy += e0 - s0; s0 = s; e0 = e; } else e0 = Math.max(e0, e); }
   busy += e0 - s0;
@@ -396,24 +401,28 @@ function measureSpeed() {
   document.documentElement.dataset.net = SLOW ? 'slow' : 'fast';
 }
 function loadFrames() {
-  let next = 0, active = 0, firstPassDone = 0, fails = 0;
-  const MAX = 6;
+  let queue = ORDER.map((i, pos) => [i, frameDir, pos < FIRST_PASS]);
+  let active = 0, issued = 0, firstPassDone = 0, fails = 0;
   const pump = () => {
-    while (active < MAX && next < ((SLOW || innerWidth <= 900) ? STEP4_END : ORDER.length)) {
-      const i = ORDER[next], pos = next++;
+    while (active < 6 && queue.length) {
+      if (SLOW && issued >= STEP2_END) { queue.length = 0; break; }   // slow line: every 2nd frame (61) keeps it smooth
+      const [i, dir, first] = queue.shift();
+      issued++;
       const img = new Image();
       img.decoding = 'async';
-      if (pos >= FIRST_PASS) img.fetchPriority = 'low';
+      if (!first) img.fetchPriority = 'low';
       active++;
       const done = ok => {
         active--;
         if (ok) {
-          frames[i] = img; loaded[i] = 1; loadedCount++;
+          const replacing = loaded[i] === 1;
+          frames[i] = img;
+          if (!replacing) { loaded[i] = 1; loadedCount++; }
           if (!firstReady && i === 0) { firstReady = true; sizeCanvas(); }
           const want = wantIdx(shown);
-          if (firstReady && Math.abs(i - want) < Math.abs(drawnIdx - want)) { drawnIdx = -1; draw(shown); }
-        } else fails++;
-        if (pos < FIRST_PASS && ++firstPassDone === FIRST_PASS) {
+          if (firstReady && (replacing ? i === drawnIdx : Math.abs(i - want) < Math.abs(drawnIdx - want))) { drawnIdx = -1; draw(shown); }
+        } else if (first) fails++;
+        if (first && ++firstPassDone === FIRST_PASS) {
           if (!firstReady || fails > FIRST_PASS / 2) { failVideo(); return; }
           stage.classList.add('video-ready');
           measureSpeed();
@@ -423,7 +432,7 @@ function loadFrames() {
       };
       img.onload = () => (img.decode ? img.decode() : Promise.resolve()).then(() => done(true), () => done(true));
       img.onerror = () => done(false);
-      img.src = frameSrc(i);
+      img.src = frameSrc(i, dir);
     }
   };
   pump();

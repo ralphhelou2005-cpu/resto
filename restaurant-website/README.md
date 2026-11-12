@@ -24,7 +24,8 @@ assets/
   js/main.js              hero scrub, Lenis + GSAP motion, menu, form
   js/vendor/              GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13, Motion 11.11.13 (self-hosted)
   images/                 WebP stills (large + -sm), hero poster/ending, og-image.jpg
-  frames/                 hero film as 121 WebP frames (1280px, about 29 KB each), loaded coarse-to-fine
+  frames/                 hero film for laptops: 121 WebP frames (1280px, quality 70), loaded coarse-to-fine
+  frames-m/               hero film for phones: 121 portrait frames (576x1024) cropped on the chef and steak
   videos/                 ftp-*.mp4 ambient loops for Fire to Pour
   fonts/                  Cormorant Garamond + Manrope (self-hosted woff2)
   icons/                  favicon.svg, apple-touch-icon.png
