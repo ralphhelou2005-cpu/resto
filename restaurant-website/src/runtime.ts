@@ -36,9 +36,19 @@ function pumpWarm() {
   }
   if (!warmQueue.length && warmActive === 0) photosDoneResolve();   // everything left was already loaded
 }
+/* On a slow line every photo uses its small version (720/540px instead of 1280/960px, about a third
+   of the bytes). Lowering `sizes` makes the browser pick the smaller file from each srcset. */
+export function applySmallPhotos() {
+  if (!isBrowser) return;
+  document.querySelectorAll<HTMLImageElement>('main img[srcset]').forEach(i => {
+    if (!(i.complete && i.naturalWidth)) i.sizes = '320px';
+  });
+}
+
 export function startPhotoWarm() {
   if (warmStarted || !isBrowser) return;
   warmStarted = true;
+  if (net.slow) applySmallPhotos();
   document.querySelectorAll<HTMLImageElement>('main img[loading="lazy"]').forEach(i => { if (i.offsetParent !== null) warmQueue.push(i); });
   if (!warmQueue.length) photosDoneResolve();
   pumpWarm();

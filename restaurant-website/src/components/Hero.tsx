@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SplitText } from './ui';
-import { clamp, smoothstep, mq, net, startPhotoWarm, photosDone, STATIC_HERO_GATES, PHONE_FILM_QUERY } from '../runtime';
+import { clamp, smoothstep, mq, net, startPhotoWarm, applySmallPhotos, photosDone, STATIC_HERO_GATES, PHONE_FILM_QUERY } from '../runtime';
 
 /* Scroll-scrubbed hero film: 121 WebP frames painted on a canvas.
    Phones get a portrait set cropped on the chef and the steak; laptops get the 1280px set.
@@ -31,6 +31,7 @@ export default function Hero() {
     const set = phone ? SETS.phone : SETS.laptop;
     const src = (i: number) => `assets/${set.dir}/f${String(i + 1).padStart(3, '0')}.webp`;
     const late = document.documentElement.classList.contains('js-late');
+    if (net.slow) applySmallPhotos();   // the browser already reports a slow line: small photos from the start
 
     /* ---------- captions ---------- */
     const cache = BANDS.map(() => ({ op: -1, k: -1, kb: -1, live: null as boolean | null }));
