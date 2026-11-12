@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SplitText } from './ui';
-import { clamp, smoothstep, mq, net, startPhotoWarm, STATIC_HERO_GATES, PHONE_FILM_QUERY } from '../runtime';
+import { clamp, smoothstep, mq, net, startPhotoWarm, photosDone, STATIC_HERO_GATES, PHONE_FILM_QUERY } from '../runtime';
 
 /* Scroll-scrubbed hero film: 121 WebP frames painted on a canvas.
    Phones get a portrait set cropped on the chef and the steak; laptops get the 1280px set.
@@ -92,12 +92,13 @@ export default function Hero() {
     };
 
     // coarse-to-fine: frames 0, 30, 60, 90, 120 first, then every 15th, 8th, 4th, 2nd, then all
-    let FIRST = 0, STEP2 = 0;
+    let FIRST = 0, STEP4 = 0, STEP2 = 0;
     const ORDER: number[] = [];
     { const seen = new Uint8Array(FRAME_COUNT);
       for (const step of [30, 15, 8, 4, 2, 1]) {
         for (let i = 0; i < FRAME_COUNT; i += step) if (!seen[i]) { seen[i] = 1; ORDER.push(i); }
         if (!FIRST) FIRST = ORDER.length;
+        if (step === 4) STEP4 = ORDER.length;
         if (step === 2) STEP2 = ORDER.length;
       } }
 
@@ -116,10 +117,12 @@ export default function Hero() {
     let alive = true;
     const loadFrames = () => {
       const queue = ORDER.map((i, pos) => [i, pos < FIRST] as const);
-      let active = 0, issued = 0, firstDone = 0, fails = 0;
+      let active = 0, issued = 0, firstDone = 0, fails = 0, photosFirst = true;
+      photosDone.then(() => { photosFirst = false; pump(); });
       const pump = () => {
         while (alive && active < 6 && queue.length) {
-          if (net.slow && issued >= STEP2) { queue.length = 0; break; }   // slow line: every 2nd frame
+          if (net.slow && issued >= STEP2) { queue.length = 0; break; }   // slow line: every 2nd frame is plenty
+          if (net.slow && photosFirst && issued >= STEP4) break;          // slow line: let the photos through first
           const [i, first] = queue.shift()!;
           issued++;
           const img = new Image();
@@ -139,8 +142,8 @@ export default function Hero() {
               if (!firstReady || fails > FIRST / 2) { stage.classList.add('video-failed'); setFailed(true); startPhotoWarm(); return; }
               stage.classList.add('video-ready');
               measureSpeed();
+              startPhotoWarm();   // photos start now, in page order
             }
-            if (!queue.length && active === 0) startPhotoWarm();   // the film is complete: now the photos may load
             ringRef.current?.style.setProperty('--ld', String(Math.round(126 * (1 - Math.min(1, loadedCount / FRAME_COUNT)))));
             pump();
           };

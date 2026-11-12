@@ -1,8 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
-import lqip from '../lqip.json';
 import { imageUrl } from '../images';
 
-const LQIP = lqip as Record<string, string>;
 export const IMG = imageUrl;
 
 /* The shared Fire Ring symbol, defined once and reused with <Ring /> */
@@ -28,7 +26,7 @@ export function Ring({ className }: { className?: string }) {
   return <svg className={className} aria-hidden="true"><use href="#firering" /></svg>;
 }
 
-/* A photo with its 20px blurred preview painted underneath while the real file downloads */
+/* A photo: appears sharp in one go once downloaded (no blurred preview) */
 type PhotoProps = {
   name: string; w: number; h: number; alt: string;
   srcSet?: [string, number][]; sizes?: string; className?: string;
@@ -36,7 +34,6 @@ type PhotoProps = {
 };
 export function Photo({ name, w, h, alt, srcSet, sizes, className, lazy = true, style }: PhotoProps) {
   const src = IMG(name);
-  const preview = LQIP[`assets/images/${name}.webp`];
   return (
     <img
       className={className}
@@ -48,7 +45,7 @@ export function Photo({ name, w, h, alt, srcSet, sizes, className, lazy = true, 
       loading={lazy ? 'lazy' : 'eager'}
       decoding="async"
       alt={alt}
-      style={preview ? { background: `url(data:image/webp;base64,${preview}) center/cover`, ...style } : style}
+      style={style}
     />
   );
 }

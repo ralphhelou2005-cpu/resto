@@ -26,14 +26,13 @@ src/
     Nav.tsx                 top bar, active section, mobile menu
     Sections.tsx            Philosophy, Open Fire, Fire to Pour, Menu, Whiskey, Tableside, Lounge, Interior, Visit, Finale, Footer
     Reservations.tsx        honest request form
-    ui.tsx                  Photo (with blurred preview), headings, Fire Ring, split text, price
+    ui.tsx                  Photo, headings, Fire Ring, split text, price
   effects.ts                reveals, anchor scrolling, Fire to Pour + Whiskey scroll motion (GSAP)
-  runtime.ts                slow-connection mode, quiet photo loading, shared helpers
+  runtime.ts                slow-connection mode, photo loading in page order, shared helpers
   entry-server.tsx          build-time pre-render entry
   images.ts                 imports every photo through Vite (content-hashed URLs)
   styles.css                the design system (all styles), bundled by Vite
   assets/images/            photos (1280/960px large, 720/540px small, WebP), processed and hashed by Vite
-  lqip.json                 20px blurred previews for every photo
 scripts/prerender.mjs       inserts the pre-rendered page into dist/index.html
 public/assets/             files loaded by fixed path at runtime
   images/og-image.jpg       link-preview image (needs a stable URL)
@@ -64,6 +63,6 @@ Street address, opening hours, phone/email, Instagram (in `FACTS`, `src/data.ts`
 ## Performance notes (measured on Intel UHD 620, 1920x1080)
 
 - Hero film: canvas backing store matches the 1280px frames and the compositor scales it; default image smoothing. Settled scroll: 58 to 60 fps.
-- Photos load in the background only after the hero film has finished loading, and never while the visitor is scrolling.
+- Photos appear sharp in one go (no blurred previews). They load in page order as soon as the hero film's first frames are in, so each one is usually ready before the visitor reaches it. On a slow line the film loads every 4th frame, lets the photos through, then fills in to every 2nd frame.
 - Slow connections (measured from the first hero frames) get every 2nd film frame and one photo at a time.
 - Sections lock with CSS `position: sticky`; reveals are CSS transitions on opacity/transform only.

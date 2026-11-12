@@ -569,7 +569,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
 /* one reveal language: photos fade in and settle, text rises softly, headings rise word by word */
 .rv-on [data-rv]{opacity:0;transform:translate3d(0,22px,0);transition:opacity 1s var(--ease-out),transform 1.2s var(--ease-out);transition-delay:calc(var(--i,0)*80ms)}
-.rv-on [data-rv="img"]{transform:scale(1.04);transition:opacity 1.3s var(--ease-out),transform 1.8s var(--ease-out);transition-delay:calc(var(--i,0)*90ms)}
+.rv-on [data-rv="img"]{transform:scale(1.025);transition:opacity .7s var(--ease-out),transform 1.1s var(--ease-out);transition-delay:calc(var(--i,0)*60ms)}
 .rv-on [data-rv].in{opacity:1;transform:none}
 .rv-on .lines .wln-i{transform:translate3d(0,112%,0);transition:transform 1.1s var(--ease-out);transition-delay:calc(var(--w,0)*55ms)}
 .rv-on .lines.in .wln-i{transform:none}
@@ -701,3 +701,6 @@ body{background:var(--canvas)}
 .mnav.is-open{animation:mnav-fade .45s var(--ease-out) both}
 .mnav.is-open nav a{animation:mnav-rise .7s var(--ease-out) both;animation-delay:calc(var(--i,7)*50ms + 80ms)}
 @media (prefers-reduced-motion: reduce){.mnav.is-open,.mnav.is-open nav a{animation:none}}
+
+/* while a photo downloads, its frame is a quiet dark panel (no blurred preview) */
+main img{background-color:#1d1814}

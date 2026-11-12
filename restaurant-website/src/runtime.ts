@@ -16,37 +16,31 @@ type NetInfo = { saveData?: boolean; effectiveType?: string };
 const nc = isBrowser ? ((navigator as unknown as { connection?: NetInfo }).connection) : undefined;
 export const net = { slow: !!(nc && (nc.saveData || /2g|3g/.test(nc.effectiveType || ''))) };
 
-/* Quietly load the remaining photos in page order once the hero film has finished loading:
-   one at a time on a slow line, two on a fast one, and never while the visitor is scrolling,
-   so downloading and decoding photos never competes with the scroll animation. */
+/* Load every photo in page order as soon as the hero film's first frames are in, so each photo is
+   already downloaded by the time the visitor scrolls to it. Two at a time on a slow line, three on a fast one. */
 const warmQueue: HTMLImageElement[] = [];
 let warmActive = 0;
 let warmStarted = false;
-let lastScroll = 0;
-let waitTimer = 0;
-if (isBrowser) window.addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
-const idle = (fn: () => void) => ('requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 800 }) : setTimeout(fn, 120));
+let photosDoneResolve: () => void = () => {};
+export const photosDone: Promise<void> = new Promise(r => { photosDoneResolve = r; });
 function pumpWarm() {
-  const quietFor = performance.now() - lastScroll;
-  if (quietFor < 700) {   // still scrolling: try again once things settle
-    clearTimeout(waitTimer);
-    waitTimer = window.setTimeout(pumpWarm, 700 - quietFor + 50);
-    return;
-  }
-  while (warmActive < (net.slow ? 1 : 2) && warmQueue.length) {
+  if (!warmQueue.length && warmActive === 0) { photosDoneResolve(); return; }
+  while (warmActive < (net.slow ? 2 : 3) && warmQueue.length) {
     const img = warmQueue.shift()!;
     if (img.complete && img.naturalWidth) continue;
     warmActive++;
-    const done = () => { warmActive--; idle(pumpWarm); };
+    const done = () => { warmActive--; pumpWarm(); };
     img.addEventListener('load', done, { once: true });
     img.addEventListener('error', done, { once: true });
     img.loading = 'eager';
   }
+  if (!warmQueue.length && warmActive === 0) photosDoneResolve();   // everything left was already loaded
 }
 export function startPhotoWarm() {
   if (warmStarted || !isBrowser) return;
   warmStarted = true;
   document.querySelectorAll<HTMLImageElement>('main img[loading="lazy"]').forEach(i => { if (i.offsetParent !== null) warmQueue.push(i); });
+  if (!warmQueue.length) photosDoneResolve();
   pumpWarm();
 }
 
