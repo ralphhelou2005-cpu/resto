@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ÂTRE | Open-Fire Fine Dining &amp; Whiskey Pairing in Downtown Beirut</title>
+<meta name="description" content="ÂTRE is an open-fire fine-dining restaurant in Downtown Beirut. Every course is cooked live over real wood and embers, and every main course is paired with a whiskey chosen to complete it. 18+ only.">
+<meta name="theme-color" content="#171614">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow">
+
+<!-- DEPLOY STEP: replace https://example.com/ with the live absolute URL in og:url, og:image, twitter:image, canonical and the JSON-LD url/image -->
+<link rel="canonical" href="https://example.com/">
+<meta property="og:type" content="restaurant">
+<meta property="og:site_name" content="ÂTRE">
+<meta property="og:title" content="ÂTRE | Born from fire. Paired with whiskey.">
+<meta property="og:description" content="Open-fire fine dining in Downtown Beirut. Live cooking over real wood, with a whiskey pairing for every main course.">
+<meta property="og:url" content="https://example.com/">
+<meta property="og:image" content="https://example.com/assets/images/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The central open-fire hearth at ÂTRE, flames under a cut of beef beneath a brass hood">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ÂTRE | Born from fire. Paired with whiskey.">
+<meta name="twitter:description" content="Open-fire fine dining in Downtown Beirut, with a whiskey pairing for every main course.">
+<meta name="twitter:image" content="https://example.com/assets/images/og-image.jpg">
+
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+
+<link rel="preload" href="assets/fonts/cormorant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "ÂTRE",
+  "slogan": "Born from fire. Paired with whiskey.",
+  "description": "Open-fire fine-dining restaurant in Downtown Beirut. Live cooking over real wood and embers, with a whiskey pairing for every main course.",
+  "servesCuisine": ["Open-fire cooking", "Grill", "Fine dining"],
+  "currenciesAccepted": "USD",
+  "url": "https://example.com/",
+  "image": "https://example.com/assets/images/og-image.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Beirut",
+    "addressRegion": "Downtown Beirut",
+    "addressCountry": "LB"
+  }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Shared SVG: the Fire Ring -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="firering" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="1"/>
+      <circle cx="32" cy="32" r="22.5" fill="none" stroke="currentColor" stroke-width=".7" opacity=".7"/>
+      <g stroke="currentColor" stroke-width="1" stroke-linecap="round">
+        <path d="M32 4.8v3.4M32 55.8v3.4M4.8 32h3.4M55.8 32h3.4" />
+        <path d="M45.6 8.4l-1.7 2.9M20.1 52.7l-1.7 2.9M55.6 18.4l-2.9 1.7M11.3 43.9l-2.9 1.7M55.6 45.6l-2.9-1.7M11.3 20.1l-2.9-1.7M45.6 55.6l-1.7-2.9M20.1 11.3l-1.7-2.9" opacity=".55"/>
+      </g>
+      <path d="M32 21c3.2 3.6 4.8 6.6 4.8 9.4a4.8 4.8 0 0 1-9.6 0c0-1.7.7-3.1 1.8-4.5.3 1.4 1 2.3 2 2.6-.6-2.4-.2-4.9 1-7.5z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- One fixed environment layer: warm drifting glow + grain -->
+<div class="env" aria-hidden="true"><div class="env__glow"></div><div class="env__grain"></div></div>
+
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#top" aria-label="ÂTRE, back to top">
+    <svg class="nav__mark" aria-hidden="true"><use href="#firering"/></svg>
+    <span class="nav__word">ÂTRE</span>
+  </a>
+  <nav class="nav__links" aria-label="Main">
+    <a href="#philosophy">Philosophy</a>
+    <a href="#fire">The Fire</a>
+    <a href="#menu">Menu</a>
+    <a href="#whiskey">Whiskey</a>
+    <a href="#lounge">Lounge</a>
+    <a href="#interior">Interior</a>
+  </nav>
+  <a class="btn btn--ember nav__cta" href="#reserve">Reserve</a>
+  <button class="nav__burger" type="button" aria-expanded="false" aria-controls="mnav" aria-label="Open menu"><span></span><span></span></button>
+</header>
+
+<div class="mnav" id="mnav" hidden>
+  <nav aria-label="Mobile">
+    <a href="#philosophy">Philosophy</a>
+    <a href="#fire">The Open Fire</a>
+    <a href="#menu">The Menu</a>
+    <a href="#whiskey">The Whiskey Library</a>
+    <a href="#tableside">Tableside</a>
+    <a href="#lounge">The Cigar Lounge</a>
+    <a href="#interior">The Interior</a>
+    <a href="#reserve" class="mnav__cta">Reserve your table</a>
+  </nav>
+  <p class="mnav__foot">Downtown Beirut · 18+ only</p>
+</div>
+
+<main id="main" tabindex="-1">
+
+<!-- 01 HERO -->
+<section class="hero" id="top" aria-label="ÂTRE, born from fire, paired with whiskey">
+  <div class="hero__stage">
+    <div class="hero__poster" aria-hidden="true"></div>
+    <video class="hero__video" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+    <div class="hero__scrim" aria-hidden="true"></div>
+    <canvas class="embers" data-embers aria-hidden="true"></canvas>
+
+    <div class="hero__bands">
+      <div class="band band--1" data-band="0,0.30" data-ramp="0.05">
+        <p class="eyebrow">Downtown Beirut · Lebanon</p>
+        <h1 class="band__title split" data-split="chars" data-seed="7">Born from<br><em>fire.</em></h1>
+      </div>
+      <div class="band band--2" data-band="0.34,0.65">
+        <p class="band__title split" data-split="words" data-seed="11" aria-hidden="true">Paired with<br><em>whiskey.</em></p>
+        <p class="sr-only">Paired with whiskey.</p>
+      </div>
+      <div class="band band--3" data-band="0.70,1">
+        <p class="band__lede split" data-split="words" data-seed="3">An intimate fire-led dining experience. Exceptional ingredients, live cooking, and whiskey selected to complete every course.</p>
+        <div class="band__ctas">
+          <a class="btn btn--ember" href="#reserve">Reserve your table</a>
+          <a class="btn btn--ghost" href="#philosophy">Discover the experience</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__cue" aria-hidden="true">
+      <svg class="ring" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="1" opacity=".25"/>
+        <circle class="ring__fill" cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)" transform="rotate(-90 24 24)"/>
+      </svg>
+      <span class="hero__cue-label">Scroll</span>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PHILOSOPHY -->
+<section class="philo section" id="philosophy" aria-labelledby="philo-h">
+  <div class="philo__media reveal-mask">
+    <img src="assets/images/wagyu-prep.webp" srcset="assets/images/wagyu-prep-sm.webp 960w, assets/images/wagyu-prep.webp 1920w" sizes="(max-width: 900px) 100vw, 58vw" width="1920" height="1072" loading="lazy" decoding="async" alt="A whole marbled wagyu striploin on a burnt-oak board beside a carbon-steel knife and a brass dish of sea salt, embers glowing behind">
+  </div>
+  <div class="philo__text">
+    <p class="label"><span>01</span> The Philosophy</p>
+    <h2 id="philo-h" class="h2 lines">Fire is our first ingredient.</h2>
+    <p class="lede fade-up">Before salt, before spice, there is the fire. Every plate at ÂTRE begins on oak, olive and vine wood, burned down to the embers that cook it.</p>
+    <p class="body fade-up">We cook the way the fire asks us to. Close and fast where a crust is wanted. Low and patient where a cut needs time. Smoke is never added later. It comes from the wood, and it stays in the food.</p>
+    <ul class="tenets">
+      <li><span class="tenets__k">Real wood</span><span>Oak for beef, olive for fish, vine for shellfish. Each wood gives its own smoke.</span></li>
+      <li><span class="tenets__k">Precise heat</span><span>Grates rise and fall by hand. The chef reads the embers, not a dial.</span></li>
+      <li><span class="tenets__k">Live cooking</span><span>Nothing is hidden. The kitchen is the centre of the room.</span></li>
+      <li><span class="tenets__k">Craft</span><span>Every cut is chosen, aged and finished with care, then carried straight from the fire to your table.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 03 THE OPEN FIRE -->
+<section class="fire section" id="fire" aria-labelledby="fire-h">
+  <div class="fire__banner">
+    <div class="fire__banner-img parallax-bg">
+      <img src="assets/images/hearth-station.webp" srcset="assets/images/hearth-station-sm.webp 960w, assets/images/hearth-station.webp 1920w" sizes="100vw" width="1920" height="1072" loading="lazy" decoding="async" alt="The open-fire hearth: an iron grill over a deep bed of oak embers, a brass wheel to raise the grate, stacked split oak beside it">
+    </div>
+    <div class="fire__banner-text">
+      <p class="label"><span>02</span> The Open Fire</p>
+      <h2 id="fire-h" class="h2 lines">The kitchen is the centre of the room.</h2>
+      <p class="lede fade-up">An open hearth burns at the heart of ÂTRE. From every seat, you watch the fire work.</p>
+    </div>
+  </div>
+
+  <div class="stations">
+    <svg class="stations__line" viewBox="0 0 10 1000" preserveAspectRatio="none" aria-hidden="true"><path d="M5 0 V1000" pathLength="1"/></svg>
+    <article class="station">
+      <div class="station__img"><img src="assets/images/hearth-station-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="Flames rising from oak embers under the adjustable iron grill"></div>
+      <div class="station__txt"><span class="station__n">I</span><h3>The wood grill</h3><p>A long iron grill over oak embers, raised and lowered by hand to hold the exact heat each cut needs.</p></div>
+    </article>
+    <article class="station">
+      <div class="station__img"><img src="assets/images/ember-ingredients-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="Vegetables and fruit blistering in a bed of coals"></div>
+      <div class="station__txt"><span class="station__n">II</span><h3>The ember beds</h3><p>Vegetables, garlic and fruit roasted directly in the coals, where they blister, soften and sweeten.</p></div>
+    </article>
+    <article class="station">
+      <div class="station__img station__img--tall"><img src="assets/images/oven-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="A domed wood-fired oven glowing in a dark stone wall, a wooden peel resting beside it"></div>
+      <div class="station__txt"><span class="station__n">III</span><h3>The wood-fired oven</h3><p>A domed oven in the stone wall for breads, bones and slow roasting.</p></div>
+    </article>
+    <article class="station">
+      <div class="station__img"><img src="assets/images/chefs-counter-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The chef's counter: leather stools along a burnt-oak counter facing the open fire"></div>
+      <div class="station__txt"><span class="station__n">IV</span><h3>The chef's counter</h3><p>Eight to ten seats facing the fire. The closest view in the house.</p></div>
+    </article>
+    <article class="station">
+      <div class="station__img"><img src="assets/images/dining-room-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The main dining room, linen-dressed tables and leather chairs facing the glowing hearth"></div>
+      <div class="station__txt"><span class="station__n">V</span><h3>The dining room</h3><p>Every table is set with a view of the hearth, so the fire is part of the evening.</p></div>
+    </article>
+  </div>
+</section>
+
+<!-- SIGNATURE: FIRE TO POUR -->
+<section class="ftp" id="fire-to-pour" aria-labelledby="ftp-h">
+  <h2 id="ftp-h" class="sr-only">From fire to pour</h2>
+  <div class="ftp__stage">
+    <div class="ftp__layer" data-stage="0">
+      <img src="assets/images/fire.webp" srcset="assets/images/fire-sm.webp 960w, assets/images/fire.webp 1920w" sizes="100vw" width="1920" height="1072" loading="lazy" decoding="async" alt="Close view of flames rising from glowing oak embers">
+      <video class="ftp__clip" data-src="assets/videos/ftp-fire.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    </div>
+    <div class="ftp__layer" data-stage="1">
+      <img src="assets/images/craft.webp" srcset="assets/images/craft-sm.webp 960w, assets/images/craft.webp 1920w" sizes="100vw" width="1920" height="1072" loading="lazy" decoding="async" alt="A chef brushing smoked butter over a seared steak on the grill">
+      <video class="ftp__clip" data-src="assets/videos/ftp-craft.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    </div>
+    <div class="ftp__layer" data-stage="2">
+      <img src="assets/images/pour.webp" srcset="assets/images/pour-sm.webp 960w, assets/images/pour.webp 1920w" sizes="100vw" width="1920" height="1072" loading="lazy" decoding="async" alt="Amber whiskey pouring from a crystal decanter into a cut-crystal tumbler over an ice sphere">
+      <video class="ftp__clip" data-src="assets/videos/ftp-pour.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+    </div>
+    <div class="ftp__shade" aria-hidden="true"></div>
+    <div class="ftp__veil" aria-hidden="true"></div>
+
+    <div class="ftp__copy">
+      <div class="ftp__step" data-step="0"><p class="ftp__num">I</p><p class="ftp__name">Fire</p><p class="ftp__line">It starts with oak, burned down to embers.</p></div>
+      <div class="ftp__step" data-step="1"><p class="ftp__num">II</p><p class="ftp__name">Craft</p><p class="ftp__line">Then the chef's hands, the heat, and the moment it is ready.</p></div>
+      <div class="ftp__step" data-step="2"><p class="ftp__num">III</p><p class="ftp__name">The Pour</p><p class="ftp__line">And finally, the whiskey chosen to meet it.</p></div>
+    </div>
+
+    <div class="ftp__dial" aria-hidden="true">
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="54" class="ftp__dial-track"/>
+        <circle cx="60" cy="60" r="54" class="ftp__dial-fill" pathLength="1" transform="rotate(-90 60 60)"/>
+      </svg>
+      <svg class="ftp__dial-mark"><use href="#firering"/></svg>
+    </div>
+
+    <div class="ftp__final">
+      <p class="ftp__final-line">Every great dish deserves the right pour.</p>
+      <a class="btn btn--ember ftp__cta" href="#menu">Explore the menu</a>
+    </div>
+  </div>
+</section>
+
+<!-- 04 MENU -->
+<section class="menu section" id="menu" aria-labelledby="menu-h">
+  <header class="menu__head">
+    <p class="label"><span>04</span> The Menu</p>
+    <h2 id="menu-h" class="h2 lines">Every course has its counterpart.</h2>
+    <p class="lede fade-up">An à la carte menu written around the fire. Every main course arrives with the whiskey we chose to complete it.</p>
+  </header>
+
+  <nav class="menu__tabs" aria-label="Menu categories">
+    <a href="#m-starters" data-tab="m-starters">Starters</a>
+    <a href="#m-mains" data-tab="m-mains">Main Courses</a>
+    <a href="#m-desserts" data-tab="m-desserts">Desserts</a>
+    <span class="menu__tab-ink" aria-hidden="true"></span>
+  </nav>
+
+  <div class="course course--starters" id="m-starters">
+    <div class="course__media reveal-mask">
+      <img src="assets/images/starters.webp" srcset="assets/images/starters-sm.webp 960w, assets/images/starters.webp 1920w" sizes="(max-width: 900px) 100vw, 45vw" width="1920" height="1072" loading="lazy" decoding="async" alt="Starters on dark stone: caviar with ember-baked brioche, roasted bone marrow with truffle and sourdough, grilled octopus with paprika and lemon">
+    </div>
+    <div class="course__list">
+      <h3 class="course__title">Starters</h3>
+      <ol class="dishes">
+        <li class="dish"><div class="dish__row"><h4>Oscietra Caviar</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Ember-baked brioche, smoked crème fraîche.</p></li>
+        <li class="dish"><div class="dish__row"><h4>Bone Marrow</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Roasted in the coals, black truffle, grilled sourdough.</p></li>
+        <li class="dish"><div class="dish__row"><h4>Wagyu Beef Tartare</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Smoked egg yolk, black truffle.</p></li>
+        <li class="dish"><div class="dish__row"><h4>Seared Foie Gras</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Fig jam prepared over the fire.</p></li>
+        <li class="dish"><div class="dish__row"><h4>Mediterranean Octopus</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Grilled over the embers, smoked paprika, lemon.</p></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="course course--mains" id="m-mains">
+    <h3 class="course__title course__title--center">Main Courses <span>each with its pour</span></h3>
+    <ol class="mains">
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/wagyu-a5-sm.webp" srcset="assets/images/wagyu-a5-sm.webp 640w, assets/images/wagyu-a5.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="Slices of seared A5 wagyu striploin with flaky salt on a dark plate"></figure>
+        <div class="main__body">
+          <span class="main__n">01</span>
+          <h4 class="main__name">A5 Japanese Wagyu Striploin</h4>
+          <p class="main__desc">Seared over oak embers.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Japanese Whisky</span><span class="pair__why">Delicate and clean, it lets the marbling speak.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/tomahawk-sm.webp" srcset="assets/images/tomahawk-sm.webp 960w, assets/images/tomahawk.webp 1920w" sizes="(max-width: 900px) 90vw, 30vw" width="960" height="536" loading="lazy" decoding="async" alt="A dry-aged tomahawk carved into rosy slices along the bone on an oak board"></figure>
+        <div class="main__body">
+          <span class="main__n">02</span>
+          <h4 class="main__name">Dry-Aged Tomahawk for Two</h4>
+          <p class="main__desc">Carved tableside.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Bold Bourbon</span><span class="pair__why">Vanilla and char to match the crust.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/lamb-sm.webp" srcset="assets/images/lamb-sm.webp 640w, assets/images/lamb.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="A rack of lamb charred over fire with smoking rosemary and roasted garlic"></figure>
+        <div class="main__body">
+          <span class="main__n">03</span>
+          <h4 class="main__name">Rack of Lamb</h4>
+          <p class="main__desc">Rosemary smoke, ember-roasted garlic.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Spicy Rye Whiskey</span><span class="pair__why">Pepper and spice against rosemary smoke.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/lobster-sm.webp" srcset="assets/images/lobster-sm.webp 640w, assets/images/lobster.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="A whole lobster split and grilled over vine wood, glossed with smoked butter"></figure>
+        <div class="main__body">
+          <span class="main__n">04</span>
+          <h4 class="main__name">Whole Grilled Lobster</h4>
+          <p class="main__desc">Vine wood, smoked butter.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Lightly Peated Single Malt</span><span class="pair__why">A gentle smoke that meets the vine wood.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/seabass-sm.webp" srcset="assets/images/seabass-sm.webp 640w, assets/images/seabass.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="A whole sea bass in an iron grilling basket over olive-wood embers"></figure>
+        <div class="main__body">
+          <span class="main__n">05</span>
+          <h4 class="main__name">Wild Sea Bass</h4>
+          <p class="main__desc">Cooked whole over olive wood.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Smoky Islay Scotch</span><span class="pair__why">Sea air and peat for a fish cooked whole.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/duck-sm.webp" srcset="assets/images/duck-sm.webp 640w, assets/images/duck.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="Sliced duck breast lacquered with honey and pomegranate glaze, scattered with pomegranate seeds"></figure>
+        <div class="main__body">
+          <span class="main__n">06</span>
+          <h4 class="main__name">Duck Breast</h4>
+          <p class="main__desc">Honey and pomegranate glaze.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Sherry-Cask Single Malt</span><span class="pair__why">Dried fruit and spice to echo the pomegranate.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/shortrib-sm.webp" srcset="assets/images/shortrib-sm.webp 640w, assets/images/shortrib.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="A wagyu short rib on the bone with a dark whiskey glaze, a tumbler of whiskey behind"></figure>
+        <div class="main__body">
+          <span class="main__n">07</span>
+          <h4 class="main__name">Wagyu Short Rib</h4>
+          <p class="main__desc">Braised for 12 hours, finished over the fire with a whiskey glaze.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Aged Bourbon</span><span class="pair__why">Deep caramel, the same note as its glaze.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+      <li class="main">
+        <figure class="main__img"><img src="assets/images/iberico-sm.webp" srcset="assets/images/iberico-sm.webp 640w, assets/images/iberico.webp 1200w" sizes="(max-width: 900px) 90vw, 30vw" width="640" height="794" loading="lazy" decoding="async" alt="Sliced Iberico pork presa beside charred peaches and apricots"></figure>
+        <div class="main__body">
+          <span class="main__n">08</span>
+          <h4 class="main__name">Iberico Pork Presa</h4>
+          <p class="main__desc">Charred stone fruit.</p>
+          <div class="pair"><svg class="pair__ring" aria-hidden="true"><use href="#firering"/></svg><div><span class="pair__k">Paired with</span><span class="pair__v">Speyside Single Malt</span><span class="pair__why">Orchard fruit beside charred stone fruit.</span></div></div>
+          <span class="price" data-price-usd="">USD · TBC</span>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="course course--desserts" id="m-desserts">
+    <div class="course__list">
+      <h3 class="course__title">Desserts</h3>
+      <ol class="dishes">
+        <li class="dish"><div class="dish__row"><h4>Dark Chocolate Fondant</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Smoked sea salt and caramel.</p></li>
+        <li class="dish"><div class="dish__row"><h4>Ember-Caramelized Figs and Dates</h4><span class="price" data-price-usd="">USD · TBC</span></div><p>Vanilla bean ice cream.</p></li>
+      </ol>
+    </div>
+    <div class="course__media reveal-mask">
+      <img src="assets/images/desserts.webp" srcset="assets/images/desserts-sm.webp 960w, assets/images/desserts.webp 1920w" sizes="(max-width: 900px) 100vw, 45vw" width="1920" height="1072" loading="lazy" decoding="async" alt="A dark chocolate fondant with caramel and sea salt beside ember-caramelized figs and dates with vanilla ice cream">
+    </div>
+  </div>
+  <p class="menu__note">All prices in USD and to be confirmed. The menu changes with the season and the fire.</p>
+</section>
+
+<!-- 05 WHISKEY LIBRARY -->
+<section class="whisky" id="whiskey" aria-labelledby="whisky-h">
+  <div class="whisky__track">
+    <div class="whisky__intro">
+      <div class="whisky__intro-img"><img src="assets/images/whiskey-library.webp" srcset="assets/images/whiskey-library-sm.webp 960w, assets/images/whiskey-library.webp 1920w" sizes="(max-width: 900px) 100vw, 60vw" width="1920" height="1072" loading="lazy" decoding="async" alt="The glass-walled whiskey library, warm-lit cabinets of amber bottles and crystal decanters with a brass ladder"></div>
+      <div class="whisky__intro-txt">
+        <p class="label"><span>05</span> The Whiskey Library</p>
+        <h2 id="whisky-h" class="h2 lines">An exceptional pour deserves its moment.</h2>
+        <p class="lede fade-up">Behind glass, the library holds the styles our menu is built around. Ask, and we will pour the one your dish was cooked for.</p>
+      </div>
+    </div>
+    <article class="style" style="--liq:#D9A441"><span class="style__n">01</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>Japanese Whisky</h3><p class="style__notes">Clean, floral, precise.</p><p class="style__meets">Meets <span>A5 Japanese Wagyu</span></p></article>
+    <article class="style" style="--liq:#B4632A"><span class="style__n">02</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>American Bourbon</h3><p class="style__notes">Vanilla, caramel, toasted oak.</p><p class="style__meets">Meets <span>Tomahawk · Short Rib</span></p></article>
+    <article class="style" style="--liq:#A8522A"><span class="style__n">03</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>Rye Whiskey</h3><p class="style__notes">Pepper, spice, a dry finish.</p><p class="style__meets">Meets <span>Rack of Lamb</span></p></article>
+    <article class="style" style="--liq:#D8B36A"><span class="style__n">04</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>Islay Scotch</h3><p class="style__notes">Peat smoke, sea salt, iodine.</p><p class="style__meets">Meets <span>Wild Sea Bass · Lobster</span></p></article>
+    <article class="style" style="--liq:#C98C3A"><span class="style__n">05</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>Speyside Single Malt</h3><p class="style__notes">Orchard fruit, honey, soft malt.</p><p class="style__meets">Meets <span>Iberico Pork Presa</span></p></article>
+    <article class="style" style="--liq:#7A3218"><span class="style__n">06</span><span class="style__glass" aria-hidden="true"><i></i></span><h3>Sherry-Cask Whisky</h3><p class="style__notes">Dried fig, raisin, warm spice.</p><p class="style__meets">Meets <span>Duck Breast</span></p></article>
+    <div class="whisky__outro">
+      <img src="assets/images/whiskey-glass-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="A cut-crystal tumbler of amber whiskey casting golden light on dark stone">
+      <p>Our selection changes with what we can source. Ask your server for tonight's pours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 TABLESIDE -->
+<section class="table section" id="tableside" aria-labelledby="table-h">
+  <div class="table__visual" aria-hidden="true">
+    <div class="table__frame">
+      <img class="is-on" data-for="0" src="assets/images/tomahawk.webp" width="1920" height="1072" loading="lazy" decoding="async" alt="">
+      <img data-for="1" src="assets/images/flambe.webp" width="1200" height="1489" loading="lazy" decoding="async" alt="">
+      <img data-for="2" src="assets/images/cloche.webp" width="1200" height="1489" loading="lazy" decoding="async" alt="">
+      <img data-for="3" src="assets/images/craft.webp" width="1920" height="1072" loading="lazy" decoding="async" alt="">
+      <img data-for="4" src="assets/images/chefs-counter.webp" width="1920" height="1072" loading="lazy" decoding="async" alt="">
+    </div>
+    <div class="table__progress"><span></span></div>
+  </div>
+  <div class="table__text">
+    <p class="label"><span>06</span> Tableside</p>
+    <h2 id="table-h" class="h2 lines">Some moments deserve a closer look.</h2>
+    <ol class="moments">
+      <li class="moment" data-i="0"><span class="moment__n">From the fire</span><h3>Carving</h3><p>The tomahawk for two is carved at your table, along the bone.</p><img class="moment__img" src="assets/images/tomahawk-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="A tomahawk steak carved into slices at the table"></li>
+      <li class="moment" data-i="1"><span class="moment__n">In the pan</span><h3>Flambé</h3><p>Figs and dates caramelised in a copper pan, finished in flame.</p><img class="moment__img" src="assets/images/flambe-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="A copper pan of figs flambéed on a brass réchaud at the table"></li>
+      <li class="moment" data-i="2"><span class="moment__n">Under glass</span><h3>Smoked beneath the cloche</h3><p>Some dishes arrive under a glass cloche of oak smoke, lifted in front of you.</p><img class="moment__img" src="assets/images/cloche-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="A plate beneath a glass cloche filled with swirling smoke"></li>
+      <li class="moment" data-i="3"><span class="moment__n">The last second</span><h3>Live finishing</h3><p>Butter, salt and a final moment over the coals, just before it leaves the fire.</p><img class="moment__img" src="assets/images/craft-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="A steak brushed with smoked butter on the grill"></li>
+      <li class="moment" data-i="4"><span class="moment__n">To the table</span><h3>The chef's counter</h3><p>Or take a seat at the counter and watch every course travel from fire to plate.</p><img class="moment__img" src="assets/images/chefs-counter-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="Leather stools at the chef's counter facing the fire"></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 07 CIGAR LOUNGE -->
+<section class="lounge" id="lounge" aria-labelledby="lounge-h">
+  <div class="lounge__bg parallax-bg"><img src="assets/images/cigar-lounge.webp" srcset="assets/images/cigar-lounge-sm.webp 960w, assets/images/cigar-lounge.webp 1920w" sizes="100vw" width="1920" height="1072" loading="lazy" decoding="async" alt="The private cigar lounge: cognac leather armchairs, walnut panelling and low brass lamps, a whiskey and a resting cigar on a side table"></div>
+  <svg class="smoke" viewBox="0 0 400 600" aria-hidden="true" preserveAspectRatio="none">
+    <path d="M200 600 C 160 500, 260 440, 210 360 S 150 220, 220 140 S 260 40, 230 0"/>
+    <path d="M240 600 C 290 520, 190 450, 250 370 S 300 230, 240 150 S 200 60, 260 0"/>
+  </svg>
+  <div class="lounge__inner">
+    <p class="label"><span>07</span> The Private Cigar Lounge</p>
+    <h2 id="lounge-h" class="h2 lines">Stay for one more.</h2>
+    <p class="lede fade-up">After dinner, the evening moves to the lounge. Cognac leather, dark wood, warm light, and a walk-in humidor.</p>
+    <ul class="lounge__list">
+      <li>Cognac leather armchairs</li>
+      <li>Walk-in humidor</li>
+      <li>Whiskey service</li>
+      <li>Intimate seating</li>
+    </ul>
+    <div class="notice" role="note">
+      <span class="notice__badge">18+</span>
+      <p>The lounge is for guests aged 18 and over. Cigars are offered separately and are not included in dining reservations.</p>
+    </div>
+  </div>
+  <figure class="lounge__inset"><img src="assets/images/humidor-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="The walk-in cedar humidor behind a bronze-framed glass door"></figure>
+</section>
+
+<!-- 08 INTERIOR -->
+<section class="interior section" id="interior" aria-labelledby="int-h">
+  <header class="interior__head">
+    <p class="label"><span>08</span> The Interior</p>
+    <h2 id="int-h" class="h2 lines">Stone, oak, brass and fire.</h2>
+    <p class="lede fade-up">One room built around one flame. Materials chosen to hold warmth and catch the light.</p>
+  </header>
+  <div class="gallery">
+    <button class="tile tile--a" type="button" data-full="assets/images/hero-start.webp" data-cap="The central hearth"><img src="assets/images/hero-start-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The central hearth under its brass hood, seen from the dining room"><span class="tile__cap">The central hearth</span></button>
+    <button class="tile tile--b" type="button" data-full="assets/images/dining-room.webp" data-cap="The dining room"><img src="assets/images/dining-room-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The dining room with linen tables facing the fire"><span class="tile__cap">The dining room</span></button>
+    <button class="tile tile--c" type="button" data-full="assets/images/materials.webp" data-cap="Materials and light"><img src="assets/images/materials-sm.webp" width="640" height="794" loading="lazy" decoding="async" alt="Honed stone, hammered brass and burnt oak under a brass sconce"><span class="tile__cap">Materials and light</span></button>
+    <button class="tile tile--d" type="button" data-full="assets/images/chefs-counter.webp" data-cap="The chef's counter"><img src="assets/images/chefs-counter-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The chef's counter facing the hearth"><span class="tile__cap">The chef's counter</span></button>
+    <button class="tile tile--e" type="button" data-full="assets/images/whiskey-library.webp" data-cap="The whiskey library"><img src="assets/images/whiskey-library-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The glass-walled whiskey library"><span class="tile__cap">The whiskey library</span></button>
+    <button class="tile tile--f" type="button" data-full="assets/images/cigar-lounge.webp" data-cap="The cigar lounge"><img src="assets/images/cigar-lounge-sm.webp" width="960" height="536" loading="lazy" decoding="async" alt="The private cigar lounge"><span class="tile__cap">The cigar lounge</span></button>
+  </div>
+</section>
+
+<dialog class="lightbox" id="lightbox" aria-label="Image viewer">
+  <figure><img alt=""><figcaption></figcaption></figure>
+  <button class="lightbox__close" type="button" aria-label="Close image viewer">Close</button>
+</dialog>
+
+<!-- 09 RESERVATIONS -->
+<section class="reserve section" id="reserve" aria-labelledby="res-h">
+  <div class="reserve__intro">
+    <p class="label"><span>09</span> Reservations</p>
+    <h2 id="res-h" class="h2 lines">Your table is waiting.</h2>
+    <p class="lede fade-up">Send a reservation request and our team will reply to confirm your table.</p>
+    <div class="notice notice--quiet" role="note"><span class="notice__badge">18+</span><p>ÂTRE welcomes guests aged 18 and over.</p></div>
+    <p class="reserve__how" data-how></p>
+  </div>
+
+  <form class="form" id="res-form" novalidate>
+    <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+    <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+    <div class="field"><label for="f-phone">Phone number</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required></div>
+    <div class="field field--half"><label for="f-date">Date</label><input id="f-date" name="date" type="date" required></div>
+    <div class="field field--half"><label for="f-time">Time</label>
+      <select id="f-time" name="time" required>
+        <option value="">Select a time</option>
+        <option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option><option>22:00</option>
+      </select>
+    </div>
+    <div class="field field--half"><label for="f-guests">Guests</label>
+      <select id="f-guests" name="guests" required>
+        <option value="">Number of guests</option>
+        <option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option><option value="5">5 guests</option><option value="6">6 guests</option><option value="7">7 guests</option><option value="8">8 guests</option><option value="9+">9 or more</option>
+      </select>
+    </div>
+    <fieldset class="field field--full prefs">
+      <legend>Dining preference</legend>
+      <label class="pref"><input type="radio" name="preference" value="Main dining room" checked><span><b>Main dining room</b><i>A table with a view of the hearth.</i></span></label>
+      <label class="pref"><input type="radio" name="preference" value="Chef's counter"><span><b>Chef's counter</b><i>Eight to ten seats facing the fire.</i></span></label>
+      <label class="pref"><input type="radio" name="preference" value="Private cigar lounge"><span><b>Private cigar lounge</b><i>18+. Cigars are offered separately.</i></span></label>
+    </fieldset>
+    <div class="field field--full"><label for="f-notes">Special requests <span class="opt">(optional)</span></label><textarea id="f-notes" name="notes" rows="3" placeholder="Allergies, occasions, seating wishes"></textarea></div>
+    <label class="check field--full"><input type="checkbox" name="age" required><span>I confirm every guest in my party is 18 or older.</span></label>
+    <p class="form__error" role="alert" aria-live="assertive"></p>
+    <button class="btn btn--ember btn--wide" type="submit"><span>Request your table</span></button>
+    <p class="form__small">This sends a request. Your table is confirmed only when our team replies.</p>
+  </form>
+
+  <div class="confirm" id="res-confirm" hidden tabindex="-1">
+    <svg class="confirm__ring" aria-hidden="true"><use href="#firering"/></svg>
+    <h3 class="confirm__title">Thank you.</h3>
+    <p class="confirm__msg" data-msg></p>
+    <button class="btn btn--ghost" type="button" data-again>Make another request</button>
+  </div>
+</section>
+
+<!-- 10 LOCATION -->
+<section class="visit section" id="visit" aria-labelledby="visit-h">
+  <div class="visit__map" role="img" aria-label="Map placeholder. The map appears once the exact address is confirmed.">
+    <svg viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <g class="map__lines"><path d="M-10 210 C 80 190, 150 230, 240 200 S 360 150, 420 170"/><path d="M60 -10 C 90 80, 70 160, 120 310"/><path d="M220 -10 C 210 90, 260 170, 240 310"/><path d="M-10 90 C 100 110, 250 60, 420 95"/><path d="M300 -10 C 330 100, 300 200, 350 310"/></g>
+      <path class="map__coast" d="M-10 268 C 70 250, 140 278, 220 258 S 340 236, 420 250"/>
+    </svg>
+    <div class="visit__pin"><svg aria-hidden="true"><use href="#firering"/></svg><span>Downtown Beirut</span></div>
+    <p class="visit__mapnote">Map arrives once the address is confirmed.</p>
+  </div>
+  <div class="visit__info">
+    <p class="label"><span>10</span> Find Us</p>
+    <h2 id="visit-h" class="h2 lines">Downtown Beirut.</h2>
+    <dl class="facts">
+      <div><dt>Address</dt><dd><span class="ph">Street address to be confirmed</span><br>Downtown Beirut, Lebanon</dd></div>
+      <div><dt>Hours</dt><dd><span class="ph">Opening hours to be confirmed</span></dd></div>
+      <div><dt>Reservations</dt><dd><span class="ph">Phone and email to be confirmed</span><br><a href="#reserve">Or send a request online</a></dd></div>
+      <div><dt>Instagram</dt><dd><span class="ph">Handle to be confirmed</span></dd></div>
+      <div><dt>Age</dt><dd>18+ only</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="finale" aria-labelledby="finale-h">
+  <div class="finale__bg"><img src="assets/images/hero-ending.webp" srcset="assets/images/hero-ending-sm.webp 960w, assets/images/hero-ending.webp 1920w" sizes="100vw" width="1920" height="1068" loading="lazy" decoding="async" alt=""></div>
+  <svg class="finale__ring" aria-hidden="true"><use href="#firering"/></svg>
+  <h2 id="finale-h" class="finale__title"><span class="lines-i">Born from fire.</span><span class="lines-i">Remembered by the pour.</span></h2>
+  <a class="btn btn--ember" href="#reserve">Reserve your table</a>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="foot__brand"><svg aria-hidden="true"><use href="#firering"/></svg><span>ÂTRE</span></div>
+  <p class="foot__tag">Born from fire. Paired with whiskey.</p>
+  <nav class="foot__nav" aria-label="Footer">
+    <a href="#menu">Menu</a><a href="#whiskey">Whiskey</a><a href="#lounge">Lounge</a><a href="#reserve">Reservations</a>
+  </nav>
+  <p class="foot__legal">Downtown Beirut, Lebanon · 18+ only · Please enjoy whiskey responsibly.<br>© <span data-year>2026</span> ÂTRE. Preview imagery is illustrative.</p>
+</footer>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/vendor/gsap.min.js" defer></script>
+<script src="assets/js/vendor/ScrollTrigger.min.js" defer></script>
+<script src="assets/js/vendor/lenis.min.js" defer></script>
+<script src="assets/js/vendor/motion.js" defer></script>
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>

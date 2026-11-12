@@ -1,0 +1,15 @@
+# Raw generations, review frames and test screenshots (large, not part of the site)
+review/
+
+# Local tooling
+.playwright-mcp/
+.claude/
+node_modules/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Third-party skill package (not ours to publish)
+*.zip
