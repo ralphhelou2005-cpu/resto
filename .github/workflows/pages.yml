@@ -23,13 +23,25 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    defaults:
+      run:
+        working-directory: restaurant-website
     steps:
       - uses: actions/checkout@v4
-      - name: Stamp asset URLs with this commit so browsers never mix old and new files
-        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" restaurant-website/index.html
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: restaurant-website/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Build (type-check, React build, pre-render)
+        run: npm run build
+      - name: Stamp the stylesheet URL with this commit so browsers never mix old and new files
+        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" dist/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: restaurant-website
+          path: restaurant-website/dist
       - id: deployment
         uses: actions/deploy-pages@v4

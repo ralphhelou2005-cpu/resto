@@ -13,3 +13,7 @@ desktop.ini
 
 # Third-party skill package (not ours to publish)
 *.zip
+
+# React build output
+restaurant-website/dist/
+restaurant-website/dist-ssr/

@@ -2,69 +2,58 @@
 
 Open-fire fine dining in Downtown Beirut. *Born from fire. Paired with whiskey.*
 
-Plain HTML, CSS and vanilla JavaScript. No build step. Upload this folder's **contents** to any static host.
+**React 19 + TypeScript + Vite**, with GSAP for scroll motion. The build pre-renders the whole page to static HTML, so it appears instantly, then React takes it over in place. It is published to GitHub Pages automatically on every push.
 
-## Preview locally
-
-The scroll-scrubbed hero needs a local server (browsers block video loading from `file://`; double-clicking `index.html` shows the designed still hero instead, by design).
+## Run it
 
 ```bash
-npx http-server restaurant-website -p 5173 -c-1
+npm install
+npm run dev        # local dev server with hot reload
+npm run build      # type-check, build, pre-render into dist/
+npm run preview    # serve the built dist/ locally
 ```
 
-Then open http://localhost:5173 in Chrome, Safari or Firefox.
-
-## Structure
+## Where things live
 
 ```
-index.html
-assets/
-  css/styles.css          design tokens, layout, all section styles
-  js/config.js            the ONE file to edit for reservations
-  js/main.js              hero scrub, Lenis + GSAP motion, menu, form
-  js/vendor/              GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13, Motion 11.11.13 (self-hosted)
-  images/                 WebP stills (large + -sm), hero poster/ending, og-image.jpg
-  frames/                 hero film for laptops: 121 WebP frames (1280px, quality 70), loaded coarse-to-fine
-  frames-m/               hero film for phones: 121 portrait frames (576x1024) cropped on the chef and steak
-  videos/                 ftp-*.mp4 ambient loops for Fire to Pour
-  fonts/                  Cormorant Garamond + Manrope (self-hosted woff2)
-  icons/                  favicon.svg, apple-touch-icon.png
+index.html                  page shell: SEO tags, structured data, early hero-frame preloads
+src/
+  data.ts                   ALL content: menu, pairings, whiskies, stations, moments, prices
+  config.ts                 reservation delivery (form service URL or email)
+  App.tsx                   page order
+  components/
+    Hero.tsx                scroll-scrubbed film (canvas frame sequence), headline beats
+    Nav.tsx                 top bar, active section, mobile menu
+    Sections.tsx            Philosophy, Open Fire, Fire to Pour, Menu, Whiskey, Tableside, Lounge, Interior, Visit, Finale, Footer
+    Reservations.tsx        honest request form
+    ui.tsx                  Photo (with blurred preview), headings, Fire Ring, split text, price
+  effects.ts                reveals, anchor scrolling, Fire to Pour + Whiskey scroll motion (GSAP)
+  runtime.ts                slow-connection mode, quiet photo loading, shared helpers
+  entry-server.tsx          build-time pre-render entry
+  lqip.json                 20px blurred previews for every photo
+scripts/prerender.mjs       inserts the pre-rendered page into dist/index.html
+public/assets/
+  css/styles.css            the design system (all styles)
+  images/                   photos (1280/960px large, 720/540px small, WebP)
+  frames/                   hero film for laptops: 121 WebP frames, 1280px
+  frames-m/                 hero film for phones: 121 portrait frames, 576x1024, framed on the chef
+  videos/                   Fire to Pour ambient loops
+  fonts/ icons/
 ```
 
-Raw generations and review files live in `../review/` and are never deployed.
+## Editing content
 
-## Before going live: owner placeholders
+- **Prices:** in `src/data.ts`, add `price: '48'` to any dish to show "USD 48". Dishes without a price show "USD · TBC".
+- **Dishes, pairings, whiskies:** edit the arrays in `src/data.ts`.
+- **Reservations:** set `reservationEndpoint` (for example a Formspree URL) or `reservationEmail` in `src/config.ts`. With both empty, the form honestly says nothing was sent.
 
-| What | Where | Current |
-|---|---|---|
-| Prices (USD) | `index.html`, every `<span class="price" data-price-usd="">` | `USD · TBC` |
-| Street address | `index.html`, Find Us section | placeholder |
-| Opening hours | `index.html`, Find Us section | placeholder |
-| Phone / email | `index.html`, Find Us section | placeholder |
-| Instagram | `index.html`, Find Us section | placeholder |
-| Map | `.visit__map` in `index.html` | designed placeholder, swap for an embed once the address is confirmed |
-| Live URL | every `https://example.com/` (marked `DEPLOY STEP` in `<head>`) | placeholder |
-| Imagery disclosure | footer line "Preview imagery is illustrative." | remove once real photography replaces it |
+## Still placeholders
 
-Nothing on the site invents awards, reviews, ratings, prices, phone numbers, emails or bottle brands.
+Street address, opening hours, phone/email, Instagram (in `FACTS`, `src/data.ts`), the map, and the footer note "Preview imagery is illustrative".
 
-## Reservations (honest request workflow)
+## Performance notes (measured on Intel UHD 620, 1920x1080)
 
-No booking system is connected. Edit `assets/js/config.js`:
-
-- `reservationEndpoint`: a form-service URL (for example Formspree). Requests are POSTed as JSON and arrive in the inbox.
-- `reservationEmail`: the confirmed reservations address. The visitor's email app opens with the request ready to send.
-- Both empty (current): the form validates, then tells the visitor clearly that **nothing was sent**.
-
-In every mode the confirmation says it is a request, not a confirmed booking. All guests must confirm they are 18+.
-
-## Motion and accessibility
-
-- Hero: the film is a sequence of 121 frames painted on a canvas. Five frames load first so scrolling animates within seconds even on slow connections; the rest fill in progressively. Frame one is the poster, preloaded from the head. Phones, portrait tablets, landscape phones and reduced-motion visitors get a designed still hero and never download the video. If the video fails, the page stays complete over the poster.
-- Signature: **Fire to Pour**, a pinned three-stage sequence (Fire, Craft, The Pour) ending on the line "Every great dish deserves the right pour." and a link to the menu.
-- Reduced motion is honored live: animations stop, pinned sections become stacked, Lenis turns off.
-- Skip link, landmarks, real heading order, alt text, 44px touch targets, focus styles in ember.
-
-## Generated media (fal)
-
-Images: `fal-ai/nano-banana-pro` (+ `/edit` for consistency and fixes). Video: `fal-ai/kling-video/v3/pro/image-to-video`. Approximate spend: about $8 of the approved $10.
+- Hero film: canvas backing store matches the 1280px frames and the compositor scales it; default image smoothing. Settled scroll: 58 to 60 fps.
+- Photos load in the background only after the hero film has finished loading, and never while the visitor is scrolling.
+- Slow connections (measured from the first hero frames) get every 2nd film frame and one photo at a time.
+- Sections lock with CSS `position: sticky`; reveals are CSS transitions on opacity/transform only.

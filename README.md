@@ -4,15 +4,17 @@
 
 Website for an open-fire fine-dining restaurant where every main course is paired with whiskey.
 
-- **`restaurant-website/`**: the site itself. Plain HTML, CSS and JavaScript, no build step. See [restaurant-website/README.md](restaurant-website/README.md) for structure, local preview, and the owner placeholders to fill before launch.
+- **`restaurant-website/`**: the site, built with React 19 + TypeScript + Vite and pre-rendered to static HTML. See [restaurant-website/README.md](restaurant-website/README.md) for structure, editing content, and the owner placeholders to fill before launch.
 - **`design-package.md`**: the creative direction: brand premise, palette, type, hero storyboard and the generation plan.
 
-## Preview locally
+## Run locally
 
 ```bash
-npx http-server restaurant-website -p 5173 -c-1
+cd restaurant-website
+npm install
+npm run dev
 ```
 
-Then open http://localhost:5173.
+Pushing to `main` builds and publishes the site to GitHub Pages automatically.
 
 All imagery and video were generated with fal and are illustrative previews until real photography replaces them.
