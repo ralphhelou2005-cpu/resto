@@ -30,7 +30,7 @@
   --maxw:1440px;
   --nav-h:76px;
 
-  --tshadow:0 1px 2px rgba(10,8,6,.95),0 3px 12px rgba(10,8,6,.78),0 10px 44px rgba(10,8,6,.8);
+  --tshadow:0 2px 16px rgba(10,8,6,.7);
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -71,7 +71,7 @@ em{font-style:italic;color:var(--brass)}
 
 /* word mask reveal (split by JS into .wln > .wln-i); em-based room for descenders */
 .wln{display:inline-block;overflow:hidden;vertical-align:top;padding:.08em .04em .2em;margin:-.08em -.04em -.2em}
-.wln-i{display:inline-block;will-change:transform}
+.wln-i{display:inline-block}
 
 /* ---------- Buttons ---------- */
 .btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:14px 28px;font-family:var(--f-body);font-size:11.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;text-decoration:none;border-radius:999px;overflow:hidden;isolation:isolate;transition:color .5s var(--ease-out),border-color .5s var(--ease-out),transform .5s var(--ease-out);text-shadow:none;white-space:nowrap}
@@ -150,7 +150,7 @@ em{font-style:italic;color:var(--brass)}
 .band__ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px;opacity:var(--kb,1);transform:translateY(calc((1 - var(--kb,1))*16px))}
 
 /* split pieces */
-.w,.c{display:inline-block;will-change:transform,opacity}
+.w,.c{display:inline-block}
 .w{white-space:nowrap}
 /* ember rise: characters lift from below like sparks */
 .band--1 .c{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.4,1);opacity:var(--kc);
@@ -168,8 +168,21 @@ em{font-style:italic;color:var(--brass)}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 @media (max-height:560px){.hero__cue{display:none}}
 
+/* ---------- Hero film on phones and portrait screens ---------- */
+@media (max-width: 720px), (orientation: portrait){
+  .hero{height:260vh}
+  .hero__poster{background-position:62% center}
+  .hero__scrim{background:linear-gradient(180deg,rgba(14,11,9,.55) 0%,rgba(14,11,9,.05) 26%,rgba(14,11,9,.3) 52%,rgba(14,11,9,.93) 100%)}
+  .band{top:auto;bottom:17vh;transform:none;left:var(--gutter);right:var(--gutter);width:auto}
+  .band::before{display:none}
+  .band__title{font-size:clamp(46px,13.5vw,96px)}
+  .band__lede{font-size:clamp(20px,5.4vw,26px);max-width:none}
+  .band__ctas{margin-top:24px}
+  .hero__cue .hero__cue-label{display:none}
+}
+
 /* ---------- Static hero: the five gates (must match JS exactly) ---------- */
-@media (max-width: 720px), (orientation: portrait) and (max-width: 1024px), (orientation: portrait) and (pointer: coarse), (orientation: landscape) and (pointer: coarse) and (max-height: 560px), (prefers-reduced-motion: reduce){
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 560px), (prefers-reduced-motion: reduce){
   .hero{height:auto}
   .hero__stage{position:relative;height:auto;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h) + 24px) var(--gutter) 48px}
   .hero__poster{background-image:image-set(url("../images/hero-ending-sm.webp") 1x,url("../images/hero-ending.webp") 2x);background-position:70% center}
@@ -338,7 +351,7 @@ em{font-style:italic;color:var(--brass)}
 }
 
 /* ---------- Whiskey library (horizontal) ---------- */
-.whisky{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--canvas),#1C1511 30%,#1C1511 70%,var(--canvas))}
+.whisky{position:relative;overflow-x:clip;background:linear-gradient(180deg,var(--canvas),#1C1511 30%,#1C1511 70%,var(--canvas))}
 .whisky__track{display:flex;align-items:stretch;gap:clamp(20px,2.4vw,36px);padding:clamp(96px,12vh,140px) var(--gutter);width:max-content;min-height:100vh;align-items:center;will-change:transform}
 .whisky__intro{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,4vw,64px);align-items:center;width:min(92vw,1240px);flex:0 0 auto}
 .whisky__intro-img{overflow:hidden;aspect-ratio:4/5;border-radius:2px}
@@ -538,4 +551,39 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
   *,*::before,*::after{animation:none!important;transition:none!important;transition-delay:0s!important;scroll-behavior:auto!important}
   .philo__media img,.course__media img,.station__img img,.main__img img,.tile img{transform:none!important}
   .ftp__layer{clip-path:none!important}
+}
+
+/* ================= Performance + motion rebuild ================= */
+/* sticky locking, handled by the browser */
+.ftp.is-pinned{height:330vh}
+.ftp.is-pinned .ftp__stage{position:sticky;top:0}
+.whisky.is-pinned .whisky__pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+
+/* nothing animates forever in the background */
+.env__glow{animation:none;will-change:auto}
+.smoke{display:none}
+.main__img img,.tile img{filter:none}
+.main:hover .main__img img,.tile:hover img,.tile:focus-visible img{filter:none}
+.tile::after{background:linear-gradient(180deg,rgba(10,8,6,.12) 0%,rgba(10,8,6,.12) 55%,rgba(10,8,6,.72))}
+.philo__media img,.course__media img,.station__img img{transform:none}
+
+/* one reveal language: photos fade in and settle, text rises softly, headings rise word by word */
+.rv-on [data-rv]{opacity:0;transform:translate3d(0,22px,0);transition:opacity 1s var(--ease-out),transform 1.2s var(--ease-out);transition-delay:calc(var(--i,0)*80ms)}
+.rv-on [data-rv="img"]{transform:scale(1.04);transition:opacity 1.3s var(--ease-out),transform 1.8s var(--ease-out);transition-delay:calc(var(--i,0)*90ms)}
+.rv-on [data-rv].in{opacity:1;transform:none}
+.rv-on .lines .wln-i{transform:translate3d(0,112%,0);transition:transform 1.1s var(--ease-out);transition-delay:calc(var(--w,0)*55ms)}
+.rv-on .lines.in .wln-i{transform:none}
+@media (prefers-reduced-motion: reduce){
+  .rv-on [data-rv]{opacity:1!important;transform:none!important}
+  .rv-on .lines .wln-i{transform:none!important}
+}
+
+/* Hero layer budget (measured on Intel UHD 620 at 1920x1080): fewer full-screen layers */
+.env{display:none}
+body{background:var(--canvas)}
+.hero__stage.video-ready .hero__poster{visibility:hidden}
+.hero__scrim{background:linear-gradient(90deg,rgba(14,11,9,.66) 0%,rgba(14,11,9,.3) 40%,rgba(14,11,9,.08) 65%,rgba(14,11,9,.38) 100%)}
+.band::before{display:none}
+@media (max-width: 720px), (orientation: portrait){
+  .hero__scrim{background:linear-gradient(180deg,rgba(14,11,9,.5) 0%,rgba(14,11,9,.05) 28%,rgba(14,11,9,.35) 55%,rgba(14,11,9,.93) 100%)}
 }

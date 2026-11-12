@@ -87,7 +87,28 @@ function maskWords(el) {
   });
   el.innerHTML = out.join('');
 }
-$$('.lines').forEach(maskWords);
+$$('.lines').forEach(h => { maskWords(h); $$('.wln-i', h).forEach((w, i) => w.style.setProperty('--w', i)); });
+
+/* Reveals: CSS transitions started by one IntersectionObserver. No per-frame JavaScript,
+   and exactly the same on phones and laptops. */
+(() => {
+  if (!('IntersectionObserver' in window)) return;
+  const IMG = '.philo__media,.course__media,.station__img,.main__img,.table__frame,.tile,.whisky__intro-img,.whisky__outro img,.lounge__inset,.visit__map,.moment__img';
+  const UP = '.label,.fade-up,.body,.tenets li,.station__txt,.course__title,.dish,.main__body > *,.style,.whisky__outro p,.lounge__list li,.notice,.form > *,.facts > div,.menu__note,.finale__title .lines-i,.finale .btn';
+  const els = [];
+  $$(IMG).forEach(e => { e.dataset.rv = 'img'; els.push(e); });
+  $$(UP).forEach(e => { if (!e.dataset.rv) { e.dataset.rv = 'up'; els.push(e); } });
+  const counts = new Map();
+  els.forEach(e => { const p = e.parentElement, n = counts.get(p) || 0; e.style.setProperty('--i', Math.min(n, 6)); counts.set(p, n + 1); });
+  $$('.lines').forEach(e => els.push(e));
+  document.documentElement.classList.add('rv-on');
+  const io = new IntersectionObserver(entries => entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const e = en.target; e.classList.add('in'); io.unobserve(e);
+    if (e.dataset.rv) setTimeout(() => e.removeAttribute('data-rv'), 2800);   // hand hover transitions back
+  }), { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+  els.forEach(e => io.observe(e));
+})();
 
 /* ------------------------------------------------------------------ */
 /* Smooth scroll (Lenis) wired to ScrollTrigger                        */
@@ -324,7 +345,7 @@ const cx = canvas.getContext('2d', { alpha: false });
 let cw = 0, ch = 0, drawnIdx = -1, firstReady = false, loadedCount = 0;
 
 function sizeCanvas() {
-  const dpr = Math.min(1.5, devicePixelRatio || 1);
+  const dpr = Math.min(innerWidth <= 900 ? 2 : 1, devicePixelRatio || 1);
   const r = stage.getBoundingClientRect();
   const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
   if (w && h && (canvas.width !== w || canvas.height !== h)) { canvas.width = cw = w; canvas.height = ch = h; drawnIdx = -1; draw(shown); }
@@ -345,7 +366,7 @@ function draw(p) {
   const img = frames[i];
   const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
   const w = img.naturalWidth * s, h = img.naturalHeight * s;
-  cx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+  cx.drawImage(img, (cw - w) * (cw < ch ? 0.62 : 0.5), (ch - h) / 2, w, h);
   drawnIdx = i;
 }
 
@@ -378,7 +399,7 @@ function loadFrames() {
   let next = 0, active = 0, firstPassDone = 0, fails = 0;
   const MAX = 6;
   const pump = () => {
-    while (active < MAX && next < (SLOW ? STEP4_END : ORDER.length)) {
+    while (active < MAX && next < ((SLOW || innerWidth <= 900) ? STEP4_END : ORDER.length)) {
       const i = ORDER[next], pos = next++;
       const img = new Image();
       img.decoding = 'async';
@@ -464,9 +485,6 @@ function runLoadRamp() {
 
 /* the five gates: identical strings to the CSS media query list */
 const GATES = [
-  '(max-width: 720px)',
-  '(orientation: portrait) and (max-width: 1024px)',
-  '(orientation: portrait) and (pointer: coarse)',
   '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
   '(prefers-reduced-motion: reduce)'
 ];
@@ -520,42 +538,31 @@ function syncClips() {
 }
 new IntersectionObserver(([en]) => { ftpVisible = en.isIntersecting; if (ftpVisible) armClips(); syncClips(); }, { rootMargin: '1200px 0px' }).observe(ftp);
 
-/* Pre-load and pre-decode heavy images well before a pinned section arrives,
-   so the browser never decodes a full-screen image mid-scroll. */
+/* Quietly load the rest of the photos in page order once the hero is ready: one at a time on a
+   slow line, two on a fast one, so they are already there when the visitor scrolls to them. */
 const idle = window.requestIdleCallback || (fn => setTimeout(fn, 120));
 const warmQueue = [];
-let warming = false;
+let warmActive = 0, warmStarted = false;
 function pumpWarm() {
-  if (SLOW) { warmQueue.length = 0; return; }   // on a slow line, let the photo on screen have the bandwidth
-  if (warming || !warmQueue.length) return;
-  warming = true;
-  idle(() => {
+  while (warmActive < (SLOW ? 1 : 2) && warmQueue.length) {
     const img = warmQueue.shift();
+    if (img.complete && img.naturalWidth) continue;
+    warmActive++;
+    const done = () => { warmActive--; idle(pumpWarm, { timeout: 800 }); };
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
     img.loading = 'eager';
-    const done = () => { warming = false; pumpWarm(); };
-    if (img.decode) img.decode().then(done, done); else { img.onload = img.onerror = done; }
-  }, { timeout: 1500 });
+  }
 }
-const prewarmIO = new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    $$('img', en.target).forEach(img => { if (!img.complete || img.loading === 'lazy') warmQueue.push(img); });
-    prewarmIO.unobserve(en.target);
-    pumpWarm();
-  });
-}, { rootMargin: '150% 0px' });
-/* start only once the hero has what it needs, so warming never competes with the hero video */
-let warmStarted = false;
 function startWarm() {
   if (warmStarted) return; warmStarted = true;
-  $$('.philo, .fire__banner, .stations, .ftp, .menu, .whisky, .table, .lounge, .gallery').forEach(s => prewarmIO.observe(s));
+  $$('main img[loading="lazy"]').forEach(i => { if (i.offsetParent !== null) warmQueue.push(i); });
+  pumpWarm();
 }
-new MutationObserver((_, mo) => {
-  if (stageReadyOrDone()) { mo.disconnect(); startWarm(); }
-}).observe($('.hero__stage'), { attributes: true, attributeFilter: ['class'] });
-function stageReadyOrDone() { const c = $('.hero__stage').classList; return c.contains('video-ready') || c.contains('video-failed'); }
-setTimeout(startWarm, 6000);                                   // safety net
-if (GATES.some(q => matchMedia(q).matches)) setTimeout(startWarm, 1200);   // phones / reduced motion: no hero video to wait for
+const stageDone = () => { const c = stage.classList; return c.contains('video-ready') || c.contains('video-failed'); };
+new MutationObserver((_, mo) => { if (stageDone()) { mo.disconnect(); startWarm(); } }).observe(stage, { attributes: true, attributeFilter: ['class'] });
+setTimeout(startWarm, 6000);
+if (GATES.some(q => matchMedia(q).matches)) setTimeout(startWarm, 1200);
 
 /* ------------------------------------------------------------------ */
 /* Tableside: active moment                                            */
@@ -707,133 +714,83 @@ form.addEventListener('submit', async e => {
 /* ------------------------------------------------------------------ */
 if (hasGSAP) {
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
   const mm = gsap.matchMedia();
 
+  /* Only three things are tied to scroll position. The sections "lock" with CSS position: sticky,
+     which the browser handles itself, so there is nothing to jump or stutter. */
   mm.add({ ok: '(prefers-reduced-motion: no-preference)', wide: '(min-width: 901px)' }, ctx => {
     const { ok, wide } = ctx.conditions;
     if (!ok) return;
 
-    /* headings: words rise out of their masks */
-    $$('.lines').forEach(h => {
-      gsap.from($$('.wln-i', h), { yPercent: 115, rotate: 2, duration: 0.9, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: h, start: 'top 94%' } });
-    });
-    $$('.label').forEach(l => gsap.from(l, { opacity: 0, x: -18, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: l, start: 'top 90%' } }));
-    $$('.fade-up').forEach(el => gsap.from(el, { opacity: 0, y: 28, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 95%' } }));
+    $$('.parallax-bg').forEach(bg => gsap.fromTo(bg, { yPercent: -6 }, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: bg.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } }));
 
-    /* philosophy: the image opens like a door of heat */
-    const pm = $('.philo__media');
-    gsap.fromTo(pm, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: pm, start: 'top 92%' } });
-    gsap.fromTo($('img', pm), { scale: 1.3 }, { scale: 1.06, ease: 'none', scrollTrigger: { trigger: pm, start: 'top bottom', end: 'bottom top', scrub: true } });
-    gsap.from($$('.tenets li'), { opacity: 0, x: -24, duration: 0.7, ease: 'power3.out', stagger: 0.1, scrollTrigger: { trigger: '.tenets', start: 'top 92%' } });
-
-    /* parallax backgrounds */
-    $$('.parallax-bg').forEach(bg => gsap.fromTo(bg, { yPercent: -8 }, { yPercent: 8, ease: 'none', scrollTrigger: { trigger: bg.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } }));
-
-    /* open fire: the brass line draws itself, images slide open from alternating sides */
-    gsap.fromTo('.stations__line', { '--draw': 1 }, { '--draw': 0, ease: 'none', scrollTrigger: { trigger: '.stations', start: 'top 70%', end: 'bottom 60%', scrub: true } });
-    $$('.station').forEach((s, i) => {
-      const box = $('.station__img', s), img = $('img', s);
-      const from = i % 2 === 0 ? 'inset(0% 0% 0% 100%)' : 'inset(0% 100% 0% 0%)';
-      gsap.fromTo(box, { clipPath: from }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.85, ease: 'expo.out', scrollTrigger: { trigger: s, start: 'top 92%' } });
-      gsap.fromTo(img, { scale: 1.3 }, { scale: 1.08, ease: 'none', scrollTrigger: { trigger: s, start: 'top bottom', end: 'bottom top', scrub: true } });
-      gsap.from($$('.station__txt > *', s), { opacity: 0, y: 24, duration: 0.7, ease: 'power3.out', stagger: 0.08, scrollTrigger: { trigger: s, start: 'top 88%' } });
-    });
-
-    /* SIGNATURE: fire to pour, pinned and scrubbed */
+    /* SIGNATURE: fire to pour */
     ftp.classList.add('is-pinned');
     const L0 = $('.ftp__layer[data-stage="0"]'), L1 = $('.ftp__layer[data-stage="1"]'), L2 = $('.ftp__layer[data-stage="2"]');
-    const S = $$('.ftp__step'), fin = $('.ftp__final'), dial = $('.ftp__dial');
+    const S = $$('.ftp__step'), fin = $('.ftp__final'), dial = $('.ftp__dial'), veil = $('.ftp__veil');
     const c0 = [198, 107, 53], c1 = [230, 179, 110];
-
-    /* lead-in: the fire rises out of the dark as the section approaches, so there is no hard cut */
-    const veil = $('.ftp__veil');
     const lead = { trigger: ftp, start: 'top 95%', end: 'top top', scrub: true };
     gsap.fromTo(veil, { opacity: 1 }, { opacity: 0, ease: 'power1.in', scrollTrigger: lead });
-    gsap.fromTo(L0, { scale: 1.22 }, { scale: 1, ease: 'none', scrollTrigger: lead });
-    gsap.fromTo($('.ftp__copy'), { opacity: 0, y: 60 }, { opacity: 1, y: 0, ease: 'power2.out', scrollTrigger: { trigger: ftp, start: 'top 55%', end: 'top 5%', scrub: true } });
+    gsap.fromTo(L0, { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: lead });
+    gsap.fromTo($('.ftp__copy'), { opacity: 0, y: 50 }, { opacity: 1, y: 0, ease: 'power2.out', scrollTrigger: { trigger: ftp, start: 'top 55%', end: 'top 5%', scrub: true } });
     gsap.fromTo(dial, { opacity: 0 }, { opacity: 1, ease: 'none', scrollTrigger: { trigger: ftp, start: 'top 30%', end: 'top top', scrub: true } });
-    ctx.add(() => () => gsap.set([veil, L0, '.ftp__copy', dial], { clearProps: 'all' }));
-
+    let lastDial = -1;
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: ftp, start: 'top top', end: '+=230%', pin: '.ftp__stage', scrub: true,
+        trigger: ftp, start: 'top top', end: 'bottom bottom', scrub: true,
         onUpdate: self => {
           const p = self.progress;
-          dial.style.setProperty('--p', p.toFixed(3));
-          const mix = c0.map((v, i) => Math.round(v + (c1[i] - v) * p));
-          dial.style.setProperty('--ftp-color', `rgb(${mix.join(',')})`);
+          if (Math.abs(p - lastDial) > 0.004) {
+            lastDial = p;
+            dial.style.setProperty('--p', p.toFixed(3));
+            dial.style.setProperty('--ftp-color', 'rgb(' + c0.map((v, i) => Math.round(v + (c1[i] - v) * p)).join(',') + ')');
+          }
           const st = p < 0.36 ? 0 : (p < 0.7 ? 1 : 2);
           if (st !== activeStage) { activeStage = st; syncClips(); }
-          fin.classList.toggle('is-on', p > 0.82);
+          const on = p > 0.82;
+          if (fin.classList.contains('is-on') !== on) fin.classList.toggle('is-on', on);
         }
       }
     });
     tl.to({}, { duration: 0.12 })
       .to(S[0], { opacity: 0, y: -40, duration: 0.08 }, 0.2)
       .fromTo(L1, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'power1.inOut' }, 0.2)
-      .fromTo($('img', L1), { scale: 1.12 }, { scale: 1, duration: 0.3, ease: 'power2.out' }, 0.2)
-      .to($('img', L0), { scale: 1.08, duration: 0.2 }, 0.16)
+      .fromTo($('img', L1), { scale: 1.1 }, { scale: 1, duration: 0.3, ease: 'power2.out' }, 0.2)
       .fromTo(S[1], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.08 }, 0.32)
       .to(S[1], { opacity: 0, y: -40, duration: 0.08 }, 0.54)
       .fromTo(L2, { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'power1.inOut' }, 0.54)
-      .fromTo($('img', L2), { scale: 1.12 }, { scale: 1, duration: 0.3, ease: 'power2.out' }, 0.54)
-      .to($('img', L1), { scale: 1.08, duration: 0.2 }, 0.5)
+      .fromTo($('img', L2), { scale: 1.1 }, { scale: 1, duration: 0.3, ease: 'power2.out' }, 0.54)
       .fromTo(S[2], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.08 }, 0.66)
       .to(S[2], { opacity: 0, y: -30, duration: 0.06 }, 0.8)
       .fromTo(fin, { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.84)
       .to({}, { duration: 0.08 });
 
-    /* menu */
-    $$('.course__media').forEach(m => {
-      gsap.fromTo(m, { clipPath: 'inset(12% 12% 12% 12%)', opacity: 0 }, { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: m, start: 'top 94%' } });
-    });
-    gsap.from($$('.dish'), { opacity: 0, y: 18, duration: 0.9, ease: 'power3.out', stagger: 0.06, scrollTrigger: { trigger: '.course--starters', start: 'top 88%' } });
-    $$('.main').forEach(m => {
-      const img = $('.main__img', m);
-      gsap.fromTo(img, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8, ease: 'expo.out', scrollTrigger: { trigger: m, start: 'top 94%' } });
-      gsap.from($$('.main__body > *', m), { opacity: 0, y: 26, duration: 0.7, ease: 'power3.out', stagger: 0.08, scrollTrigger: { trigger: m, start: 'top 90%' } });
-      gsap.from($('.pair__ring', m), { rotate: -180, scale: 0.6, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: m, start: 'top 88%' } });
-    });
-
-    /* whiskey library: horizontal on wide screens */
+    /* whiskey library: sideways on wide screens */
+    let cleanW = null;
     if (wide) {
       const wsec = $('.whisky'), track = $('.whisky__track');
       wsec.classList.add('is-pinned');
       const dist = () => Math.max(0, track.scrollWidth - innerWidth);
-      const h = gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: wsec, start: 'top top', end: () => '+=' + dist(), pin: true, scrub: true, invalidateOnRefresh: true } });
-      $$('.style', wsec).forEach(s => {
-        gsap.from($('.style__glass i', s), { scaleY: 0, duration: 1.2, ease: 'power2.out', scrollTrigger: { trigger: s, containerAnimation: h, start: 'left 85%' } });
-        gsap.from(s, { y: 60, opacity: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: s, containerAnimation: h, start: 'left 95%' } });
-      });
-      ctx.add(() => () => wsec.classList.remove('is-pinned'));
+      const setH = () => { wsec.style.height = (innerHeight + dist()) + 'px'; };
+      setH();
+      ScrollTrigger.addEventListener('refreshInit', setH);
+      gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: wsec, start: 'top top', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true } });
+      cleanW = () => { ScrollTrigger.removeEventListener('refreshInit', setH); wsec.classList.remove('is-pinned'); wsec.style.height = ''; gsap.set(track, { clearProps: 'transform' }); };
     }
 
-    /* tableside: progress */
-    gsap.from('.table__frame', { clipPath: 'inset(20% 10% 0% 10% round 200px 200px 2px 2px)', duration: 1, ease: 'expo.out', scrollTrigger: { trigger: '.table', start: 'top 90%' } });
-
-    /* lounge: slow, low light */
-    gsap.from($$('.lounge__list li, .lounge .notice'), { opacity: 0, y: 24, duration: 0.9, ease: 'power2.out', stagger: 0.1, scrollTrigger: { trigger: '.lounge__list', start: 'top 85%' } });
-    if (wide) gsap.fromTo('.lounge__inset', { y: 120 }, { y: -60, ease: 'none', scrollTrigger: { trigger: '.lounge', start: 'top bottom', end: 'bottom top', scrub: true } });
-
-    /* interior: tiles unveil in sequence */
-    gsap.fromTo($$('.tile'), { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8, ease: 'expo.out', stagger: 0.06, scrollTrigger: { trigger: '.gallery', start: 'top 92%' } });
-
-    /* reservations + visit + finale */
-    gsap.from($$('.form > *'), { opacity: 0, y: 20, duration: 0.9, ease: 'power3.out', stagger: 0.04, scrollTrigger: { trigger: '.form', start: 'top 80%' } });
-    gsap.fromTo('.map__lines path, .map__coast', { strokeDasharray: '600', strokeDashoffset: 600 }, { strokeDashoffset: 0, duration: 2.4, ease: 'power2.inOut', stagger: 0.12, scrollTrigger: { trigger: '.visit__map', start: 'top 80%' } });
-    gsap.from($$('.facts > div'), { opacity: 0, x: 20, duration: 0.9, ease: 'power3.out', stagger: 0.07, scrollTrigger: { trigger: '.facts', start: 'top 85%' } });
-    gsap.from('.finale__title .lines-i', { yPercent: 40, opacity: 0, duration: 1.6, ease: 'expo.out', stagger: 0.18, scrollTrigger: { trigger: '.finale', start: 'top 65%' } });
-    gsap.fromTo('.finale__bg img', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.finale', start: 'top bottom', end: 'bottom bottom', scrub: true } });
-
-    return () => { ftp.classList.remove('is-pinned'); };
+    return () => {
+      ftp.classList.remove('is-pinned');
+      gsap.set([veil, L0, L1, L2, '.ftp__copy', dial, fin, ...S], { clearProps: 'all' });
+      if (cleanW) cleanW();
+    };
   });
 
   addEventListener('load', () => ScrollTrigger.refresh());
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
 
-  /* safety net: if the page height ever changes after load (an image, a font, a resize of content),
-     recalculate every pinned section so none of them locks in early and jumps */
+  /* safety net: if the page height changes after load, recalculate scroll positions */
   let lastH = document.documentElement.scrollHeight, hTimer = null;
   new ResizeObserver(() => {
     clearTimeout(hTimer);
