@@ -1,8 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react';
 import lqip from '../lqip.json';
+import { imageUrl } from '../images';
 
 const LQIP = lqip as Record<string, string>;
-export const IMG = (name: string) => `assets/images/${name}.webp`;
+export const IMG = imageUrl;
 
 /* The shared Fire Ring symbol, defined once and reused with <Ring /> */
 export function FireRingDefs() {
@@ -35,7 +36,7 @@ type PhotoProps = {
 };
 export function Photo({ name, w, h, alt, srcSet, sizes, className, lazy = true, style }: PhotoProps) {
   const src = IMG(name);
-  const preview = LQIP[src];
+  const preview = LQIP[`assets/images/${name}.webp`];
   return (
     <img
       className={className}

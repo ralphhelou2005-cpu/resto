@@ -30,22 +30,32 @@ src/
   effects.ts                reveals, anchor scrolling, Fire to Pour + Whiskey scroll motion (GSAP)
   runtime.ts                slow-connection mode, quiet photo loading, shared helpers
   entry-server.tsx          build-time pre-render entry
+  images.ts                 imports every photo through Vite (content-hashed URLs)
+  styles.css                the design system (all styles), bundled by Vite
+  assets/images/            photos (1280/960px large, 720/540px small, WebP), processed and hashed by Vite
   lqip.json                 20px blurred previews for every photo
 scripts/prerender.mjs       inserts the pre-rendered page into dist/index.html
-public/assets/
-  css/styles.css            the design system (all styles)
-  images/                   photos (1280/960px large, 720/540px small, WebP)
+public/assets/             files loaded by fixed path at runtime
+  images/og-image.jpg       link-preview image (needs a stable URL)
   frames/                   hero film for laptops: 121 WebP frames, 1280px
   frames-m/                 hero film for phones: 121 portrait frames, 576x1024, framed on the chef
   videos/                   Fire to Pour ambient loops
   fonts/ icons/
 ```
 
+## Adding or replacing a photo
+
+Put the WebP file in `src/assets/images/` and use its name (without `.webp`) in `src/data.ts` or a component. A missing photo on the page fails the build with its name, so a typo there cannot ship (gallery full-size photos are checked when a tile is opened).
+
 ## Editing content
 
 - **Prices:** in `src/data.ts`, add `price: '48'` to any dish to show "USD 48". Dishes without a price show "USD · TBC".
 - **Dishes, pairings, whiskies:** edit the arrays in `src/data.ts`.
 - **Reservations:** set `reservationEndpoint` (for example a Formspree URL) or `reservationEmail` in `src/config.ts`. With both empty, the form honestly says nothing was sent.
+
+## Hosting path
+
+Production builds use the base path `/resto/` (`vite.config.ts`). If a custom domain is added, change `BASE` to `'/'`.
 
 ## Still placeholders
 

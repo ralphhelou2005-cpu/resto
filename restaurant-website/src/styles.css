@@ -1,8 +1,8 @@
 /* ÂTRE · Born from fire. Paired with whiskey. */
 
-@font-face{font-family:"Cormorant";src:url("../fonts/cormorant.woff2") format("woff2");font-weight:300 700;font-style:normal;font-display:swap}
-@font-face{font-family:"Cormorant";src:url("../fonts/cormorant-italic.woff2") format("woff2");font-weight:300 700;font-style:italic;font-display:swap}
-@font-face{font-family:"Manrope";src:url("../fonts/manrope.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
+@font-face{font-family:"Cormorant";src:url("/assets/fonts/cormorant.woff2") format("woff2");font-weight:300 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Cormorant";src:url("/assets/fonts/cormorant-italic.woff2") format("woff2");font-weight:300 700;font-style:italic;font-display:swap}
+@font-face{font-family:"Manrope";src:url("/assets/fonts/manrope.woff2") format("woff2");font-weight:200 800;font-style:normal;font-display:swap}
 
 :root{
   --canvas:#171614;
@@ -123,7 +123,7 @@ em{font-style:italic;color:var(--brass)}
 /* ---------- Hero (scrub mode is default) ---------- */
 .hero{position:relative;height:300vh}
 .hero__stage{position:sticky;top:0;height:100vh;height:100lvh;overflow:hidden;background:var(--canvas-deep)}
-.hero__poster{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url("../frames/f001.webp")}
+.hero__poster{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url("/assets/frames/f001.webp")}
 /* scripts arriving late (slow connection): show the opening headline in its final state instead of waiting */
 .js-late .band--1 .c{opacity:1!important;transform:none!important}
 .js-late .band--1 .eyebrow{opacity:1;transform:none}
@@ -171,7 +171,7 @@ em{font-style:italic;color:var(--brass)}
 /* ---------- Hero film on phones and portrait screens ---------- */
 @media (max-width: 720px), (orientation: portrait){
   .hero{height:260vh}
-  .hero__poster{background-image:url("../frames-m/f001.webp");background-position:center}
+  .hero__poster{background-image:url("/assets/frames-m/f001.webp");background-position:center}
   .hero__scrim{background:linear-gradient(180deg,rgba(14,11,9,.55) 0%,rgba(14,11,9,.05) 26%,rgba(14,11,9,.3) 52%,rgba(14,11,9,.93) 100%)}
   .band{top:auto;bottom:17vh;transform:none;left:var(--gutter);right:var(--gutter);width:auto}
   .band::before{display:none}
@@ -185,7 +185,7 @@ em{font-style:italic;color:var(--brass)}
 @media (orientation: landscape) and (pointer: coarse) and (max-height: 560px), (prefers-reduced-motion: reduce){
   .hero{height:auto}
   .hero__stage{position:relative;height:auto;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--nav-h) + 24px) var(--gutter) 48px}
-  .hero__poster{background-image:image-set(url("../images/hero-ending-sm.webp") 1x,url("../images/hero-ending.webp") 2x);background-position:70% center}
+  .hero__poster{background-image:image-set(url("./assets/images/hero-ending-sm.webp") 1x,url("./assets/images/hero-ending.webp") 2x);background-position:70% center}
   .hero__video,.hero__cue{display:none}
   .hero__scrim{background:linear-gradient(180deg,rgba(14,11,9,.55) 0%,rgba(14,11,9,.2) 30%,rgba(14,11,9,.55) 55%,rgba(14,11,9,.94) 100%)}
   .hero__bands{position:relative;inset:auto;pointer-events:auto;display:flex;flex-direction:column;gap:14px}

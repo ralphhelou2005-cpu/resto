@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App';
+import './styles.css';
 
 declare global { interface Window { ATRE_READY?: boolean } }
 window.ATRE_READY = true;

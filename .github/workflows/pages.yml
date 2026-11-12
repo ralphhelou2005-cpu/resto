@@ -37,8 +37,6 @@ jobs:
         run: npm ci
       - name: Build (type-check, React build, pre-render)
         run: npm run build
-      - name: Stamp the stylesheet URL with this commit so browsers never mix old and new files
-        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::8}/g" dist/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
