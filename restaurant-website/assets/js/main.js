@@ -15,6 +15,8 @@ const hasGSAP = !!(window.gsap && window.ScrollTrigger);
 const EASE = [0.22, 1, 0.36, 1];
 
 document.documentElement.classList.add('js');
+const LATE = document.documentElement.classList.contains('js-late');
+window.ATRE_READY = true;
 $$('[data-year]').forEach(n => { n.textContent = new Date().getFullYear(); });
 
 /* ------------------------------------------------------------------ */
@@ -265,17 +267,14 @@ const liveIO = new IntersectionObserver(entries => entries.forEach(en => en.targ
 $$('.lounge, .visit, .finale, .ftp').forEach(s => liveIO.observe(s));
 
 /* ------------------------------------------------------------------ */
-/* HERO: scroll-scrubbed video                                         */
+/* HERO: scroll-scrubbed film (frame sequence on canvas)               */
 /* ------------------------------------------------------------------ */
 const hero = $('.hero');
 const stage = $('.hero__stage');
-const video = $('.hero__video');
 const posterLayer = $('.hero__poster');
 const cue = $('.hero__cue');
 const ring = $('.ring', cue);
-const VIDEO_URL = 'assets/videos/hero-scrub.mp4';
-const VIDEO_BYTES = 2964925;
-const POSTER_URL = 'assets/images/hero-poster.jpg';
+const POSTER_URL = 'assets/frames/f001.webp';   // frame one doubles as the poster (29 KB)
 
 const bands = $$('.band').map((el, i, arr) => {
   const [a, b] = el.dataset.band.split(',').map(Number);
@@ -309,32 +308,97 @@ function updateCaptions(p) {
   if (cue.classList.contains('is-gone') !== gone) cue.classList.toggle('is-gone', gone);
 }
 
-/* gated seeks */
-let seekBusy = false, pendingTime = null;
-function requestSeek(t) {
-  if (!video.duration || !videoReady) return;
-  t = clamp(t, 0, video.duration - 0.04);
-  if (seekBusy) { pendingTime = t; return; }
-  if (Math.abs(video.currentTime - t) < 0.01) return;
-  seekBusy = true;
-  video.currentTime = t;
+/* Frame-sequence scrub: the hero film is 121 small WebP stills painted on a canvas.
+   Coarse-to-fine loading means scrolling works within seconds on slow connections,
+   and drawing a decoded image is far cheaper than seeking a video. */
+const FRAME_COUNT = 121;
+const frameSrc = i => `assets/frames/f${String(i + 1).padStart(3, '0')}.webp`;
+const frames = new Array(FRAME_COUNT);
+const loaded = new Uint8Array(FRAME_COUNT);
+const canvas = $('.hero__canvas');
+const cx = canvas.getContext('2d', { alpha: false });
+let cw = 0, ch = 0, drawnIdx = -1, firstReady = false, loadedCount = 0;
+
+function sizeCanvas() {
+  const dpr = Math.min(1.5, devicePixelRatio || 1);
+  const r = stage.getBoundingClientRect();
+  const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (w && h && (canvas.width !== w || canvas.height !== h)) { canvas.width = cw = w; canvas.height = ch = h; drawnIdx = -1; draw(shown); }
 }
-video.addEventListener('seeked', () => {
-  seekBusy = false;
-  if (pendingTime !== null) { const t = pendingTime; pendingTime = null; requestSeek(t); }
-});
-video.addEventListener('error', () => { seekBusy = false; pendingTime = null; failVideo(); });
+function nearestLoaded(i) {
+  if (loaded[i]) return i;
+  for (let d = 1; d < FRAME_COUNT; d++) {
+    if (i - d >= 0 && loaded[i - d]) return i - d;
+    if (i + d < FRAME_COUNT && loaded[i + d]) return i + d;
+  }
+  return -1;
+}
+function wantIdx(p) { return Math.round(clamp(p, 0, 1) * (FRAME_COUNT - 1)); }
+function draw(p) {
+  if (!firstReady || !cw) return;
+  const i = nearestLoaded(wantIdx(p));
+  if (i < 0 || i === drawnIdx) return;
+  const img = frames[i];
+  const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+  const w = img.naturalWidth * s, h = img.naturalHeight * s;
+  cx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+  drawnIdx = i;
+}
+
+/* coarse-to-fine order: frames 0, 30, 60, 90, 120 first, then every 15th, 8th, 4th, 2nd, then all */
+let FIRST_PASS = 0;
+const ORDER = (() => {
+  const seen = new Uint8Array(FRAME_COUNT), out = [];
+  for (const step of [30, 15, 8, 4, 2, 1]) {
+    for (let i = 0; i < FRAME_COUNT; i += step) if (!seen[i]) { seen[i] = 1; out.push(i); }
+    if (!FIRST_PASS) FIRST_PASS = out.length;
+  }
+  return out;
+})();
+
+function loadFrames() {
+  let next = 0, active = 0, firstPassDone = 0, fails = 0;
+  const MAX = 6;
+  const pump = () => {
+    while (active < MAX && next < ORDER.length) {
+      const i = ORDER[next], pos = next++;
+      const img = new Image();
+      img.decoding = 'async';
+      if (pos >= FIRST_PASS) img.fetchPriority = 'low';
+      active++;
+      const done = ok => {
+        active--;
+        if (ok) {
+          frames[i] = img; loaded[i] = 1; loadedCount++;
+          if (!firstReady && i === 0) { firstReady = true; sizeCanvas(); }
+          const want = wantIdx(shown);
+          if (firstReady && Math.abs(i - want) < Math.abs(drawnIdx - want)) { drawnIdx = -1; draw(shown); }
+        } else fails++;
+        if (pos < FIRST_PASS && ++firstPassDone === FIRST_PASS) {
+          if (!firstReady || fails > FIRST_PASS / 2) { failVideo(); return; }
+          stage.classList.add('video-ready');
+        }
+        ring.style.setProperty('--ld', Math.round(126 * (1 - Math.min(1, loadedCount / FRAME_COUNT))));
+        pump();
+      };
+      img.onload = () => (img.decode ? img.decode() : Promise.resolve()).then(() => done(true), () => done(true));
+      img.onerror = () => done(false);
+      img.src = frameSrc(i);
+    }
+  };
+  pump();
+}
 
 /* dt-normalized lerp loop that rests */
-let target = 0, shown = 0, rafId = null, lastTick = 0, heroOnScreen = true, videoReady = false;
+let target = 0, shown = 0, rafId = null, lastTick = 0, heroOnScreen = true;
 function tick(now) {
   const dt = Math.min(100, now - (lastTick || now));
   lastTick = now;
-  const k = 0.26;     // Lenis already smooths the wheel, so the scrub only needs a light ease
+  const k = 0.3;     // Lenis already smooths the wheel, so the scrub only needs a light ease
   shown += (target - shown) * (1 - Math.pow(1 - k, dt / 16.667));
   if (Math.abs(target - shown) < 0.0005) { shown = target; rafId = null; lastTick = 0; }
   else rafId = requestAnimationFrame(tick);
-  if (videoReady) requestSeek(shown * video.duration);
+  draw(shown);
   updateCaptions(shown);
 }
 function onHeroScroll() {
@@ -346,48 +410,18 @@ new IntersectionObserver(([en]) => {
   if (heroOnScreen) onHeroScroll();
 }).observe(hero);
 
-/* poster first, then the streamed Blob behind the Fire Ring */
+/* frames behind the Fire Ring; frame one is the poster */
 let heroInit = false;
 function initHeroOnce() {
   if (heroInit) return; heroInit = true;
   posterLayer.style.backgroundImage = `url('${POSTER_URL}')`;
-  let started = false;
-  const startBlobFetch = () => { if (started) return; started = true; loadHeroBlob().catch(failVideo); };
-  const img = new Image();
-  img.onload = startBlobFetch; img.onerror = startBlobFetch; img.src = POSTER_URL;
-  setTimeout(startBlobFetch, 4000);
-}
-async function loadHeroBlob() {
-  if (location.protocol === 'file:') throw new Error('file protocol');
-  const ctrl = new AbortController();
-  let watchdog = setTimeout(() => ctrl.abort(), 20000);
-  const res = await fetch(VIDEO_URL, { priority: 'low', signal: ctrl.signal });
-  if (!res.ok || !res.body) throw new Error('video ' + res.status);
-  const total = Number(res.headers.get('Content-Length')) || VIDEO_BYTES;
-  const reader = res.body.getReader();
-  const chunks = []; let got = 0, lastRing = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    clearTimeout(watchdog); watchdog = setTimeout(() => ctrl.abort(), 20000);
-    chunks.push(value); got += value.length;
-    const frac = Math.min(1, got / total), now = performance.now();
-    if (now - lastRing > 100 || frac === 1) { lastRing = now; ring.style.setProperty('--ld', Math.round(126 * (1 - frac))); }
-  }
-  clearTimeout(watchdog);
-  ring.style.setProperty('--ld', 0);
-  video.src = URL.createObjectURL(new Blob(chunks, { type: 'video/mp4' }));
-  video.load();
-  video.addEventListener('canplay', () => {
-    videoReady = true;
-    requestSeek(heroProgress() * video.duration);
-    stage.classList.add('video-ready');
-  }, { once: true });
+  addEventListener('resize', sizeCanvas, { passive: true });
+  sizeCanvas();
+  loadFrames();   // the first frames were already requested by <link rel=preload> in the head
 }
 function failVideo() {
   if (stage.classList.contains('video-failed')) return;
   stage.classList.add('video-failed');
-  videoReady = false;
   const chev = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   chev.setAttribute('viewBox', '0 0 48 48'); chev.setAttribute('class', 'chev');
   chev.innerHTML = '<circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/><path d="M17 21l7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.5"/>';
@@ -398,6 +432,7 @@ function failVideo() {
 let loadRampDone = false;
 function runLoadRamp() {
   if (loadRampDone) return; loadRampDone = true;
+  if (LATE) { loadK = 1; updateCaptions(shown); return; }   // headline already shown in final state
   const t0 = performance.now(), D = 1700;
   const step = now => {
     const t = clamp((now - t0) / D, 0, 1);

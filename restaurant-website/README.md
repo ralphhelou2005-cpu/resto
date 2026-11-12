@@ -24,7 +24,8 @@ assets/
   js/main.js              hero scrub, Lenis + GSAP motion, menu, form
   js/vendor/              GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13, Motion 11.11.13 (self-hosted)
   images/                 WebP stills (large + -sm), hero poster/ending, og-image.jpg
-  videos/                 hero-scrub.mp4 (3.0 MB, 1280px, keyframe every 4 frames), ftp-*.mp4 ambient loops
+  frames/                 hero film as 121 WebP frames (1280px, about 29 KB each), loaded coarse-to-fine
+  videos/                 ftp-*.mp4 ambient loops for Fire to Pour
   fonts/                  Cormorant Garamond + Manrope (self-hosted woff2)
   icons/                  favicon.svg, apple-touch-icon.png
 ```
@@ -58,7 +59,7 @@ In every mode the confirmation says it is a request, not a confirmed booking. Al
 
 ## Motion and accessibility
 
-- Hero: video fetched as a Blob behind a loading ring, eased scrub, gated seeks. Phones, portrait tablets, landscape phones and reduced-motion visitors get a designed still hero and never download the video. If the video fails, the page stays complete over the poster.
+- Hero: the film is a sequence of 121 frames painted on a canvas. Five frames load first so scrolling animates within seconds even on slow connections; the rest fill in progressively. Frame one is the poster, preloaded from the head. Phones, portrait tablets, landscape phones and reduced-motion visitors get a designed still hero and never download the video. If the video fails, the page stays complete over the poster.
 - Signature: **Fire to Pour**, a pinned three-stage sequence (Fire, Craft, The Pour) ending on the line "Every great dish deserves the right pour." and a link to the menu.
 - Reduced motion is honored live: animations stop, pinned sections become stacked, Lenis turns off.
 - Skip link, landmarks, real heading order, alt text, 44px touch targets, focus styles in ember.
