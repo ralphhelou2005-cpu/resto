@@ -24,7 +24,7 @@ assets/
   js/main.js              hero scrub, Lenis + GSAP motion, menu, form
   js/vendor/              GSAP 3.12.5, ScrollTrigger, Lenis 1.1.13, Motion 11.11.13 (self-hosted)
   images/                 WebP stills (large + -sm), hero poster/ending, og-image.jpg
-  videos/                 hero-scrub.mp4 (7.5 MB, 1440px, keyframe every 2 frames), ftp-*.mp4 ambient loops
+  videos/                 hero-scrub.mp4 (3.0 MB, 1280px, keyframe every 4 frames), ftp-*.mp4 ambient loops
   fonts/                  Cormorant Garamond + Manrope (self-hosted woff2)
   icons/                  favicon.svg, apple-touch-icon.png
 ```

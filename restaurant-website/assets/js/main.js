@@ -274,7 +274,7 @@ const posterLayer = $('.hero__poster');
 const cue = $('.hero__cue');
 const ring = $('.ring', cue);
 const VIDEO_URL = 'assets/videos/hero-scrub.mp4';
-const VIDEO_BYTES = 7516918;
+const VIDEO_BYTES = 2964925;
 const POSTER_URL = 'assets/images/hero-poster.jpg';
 
 const bands = $$('.band').map((el, i, arr) => {
