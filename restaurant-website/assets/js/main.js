@@ -10,6 +10,10 @@ const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const smoothstep = (p, e0, e1) => { const t = clamp((p - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
+/* Slow-connection mode: decided from the browser's hint, then confirmed by measuring the first hero frames.
+   When slow: fewer hero frames, no background photo preloading, no ambient clips. */
+const NC = navigator.connection;
+let SLOW = !!(NC && (NC.saveData || /2g|3g/.test(NC.effectiveType || '')));
 const M = window.Motion || null;
 const hasGSAP = !!(window.gsap && window.ScrollTrigger);
 const EASE = [0.22, 1, 0.36, 1];
@@ -346,21 +350,35 @@ function draw(p) {
 }
 
 /* coarse-to-fine order: frames 0, 30, 60, 90, 120 first, then every 15th, 8th, 4th, 2nd, then all */
-let FIRST_PASS = 0;
+let FIRST_PASS = 0, STEP4_END = 0;
 const ORDER = (() => {
   const seen = new Uint8Array(FRAME_COUNT), out = [];
   for (const step of [30, 15, 8, 4, 2, 1]) {
     for (let i = 0; i < FRAME_COUNT; i += step) if (!seen[i]) { seen[i] = 1; out.push(i); }
     if (!FIRST_PASS) FIRST_PASS = out.length;
+    if (step === 4) STEP4_END = out.length;
   }
   return out;
 })();
 
+function measureSpeed() {
+  const rs = performance.getEntriesByType('resource').filter(r => r.name.includes('/frames/') && r.responseEnd > 0 && r.responseStart > 0);
+  if (rs.length < 3) return;
+  const bytes = rs.reduce((s, r) => s + (r.encodedBodySize || r.transferSize || 27000), 0);
+  // count only the time when bytes were actually arriving (merged transfer windows), not queueing or script waits
+  const spans = rs.map(r => [r.responseStart, r.responseEnd]).sort((a, b) => a[0] - b[0]);
+  let busy = 0, [s0, e0] = spans[0];
+  for (const [s, e] of spans.slice(1)) { if (s > e0) { busy += e0 - s0; s0 = s; e0 = e; } else e0 = Math.max(e0, e); }
+  busy += e0 - s0;
+  const kbps = bytes / 1024 / Math.max(0.02, busy / 1000);
+  if (kbps < 300) SLOW = true;
+  document.documentElement.dataset.net = SLOW ? 'slow' : 'fast';
+}
 function loadFrames() {
   let next = 0, active = 0, firstPassDone = 0, fails = 0;
   const MAX = 6;
   const pump = () => {
-    while (active < MAX && next < ORDER.length) {
+    while (active < MAX && next < (SLOW ? STEP4_END : ORDER.length)) {
       const i = ORDER[next], pos = next++;
       const img = new Image();
       img.decoding = 'async';
@@ -377,6 +395,7 @@ function loadFrames() {
         if (pos < FIRST_PASS && ++firstPassDone === FIRST_PASS) {
           if (!firstReady || fails > FIRST_PASS / 2) { failVideo(); return; }
           stage.classList.add('video-ready');
+          measureSpeed();
         }
         ring.style.setProperty('--ld', Math.round(126 * (1 - Math.min(1, loadedCount / FRAME_COUNT))));
         pump();
@@ -482,7 +501,7 @@ const ftp = $('.ftp');
 /* Fire to Pour clips: desktop, motion allowed, visible only */
 const clips = $$('.ftp__clip');
 let clipsArmed = false, activeStage = 0, ftpVisible = false;
-const canClips = () => !RM.matches && innerWidth > 900 && !(navigator.connection && navigator.connection.saveData);
+const canClips = () => !RM.matches && !SLOW && innerWidth > 900;
 function armClips() {
   if (clipsArmed || !canClips()) return; clipsArmed = true;
   clips.forEach(v => {
@@ -507,6 +526,7 @@ const idle = window.requestIdleCallback || (fn => setTimeout(fn, 120));
 const warmQueue = [];
 let warming = false;
 function pumpWarm() {
+  if (SLOW) { warmQueue.length = 0; return; }   // on a slow line, let the photo on screen have the bandwidth
   if (warming || !warmQueue.length) return;
   warming = true;
   idle(() => {
