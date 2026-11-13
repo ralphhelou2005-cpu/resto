@@ -59,7 +59,9 @@ export default function Hero() {
     };
 
     /* ---------- frames ---------- */
-    const frames: HTMLImageElement[] = new Array(FRAME_COUNT);
+    /* Frames are kept as fully unpacked bitmaps (createImageBitmap runs off the main thread), so painting
+       a frame for the first time costs the same as the hundredth: no stutter on the first scroll. */
+    const frames: (ImageBitmap | HTMLImageElement)[] = new Array(FRAME_COUNT);
     const loaded = new Uint8Array(FRAME_COUNT);
     let cw = 0, ch = 0, drawnIdx = -1, firstReady = false, loadedCount = 0;
     let shown = 0, target = 0, rafId: number | null = null, lastTick = 0, heroOnScreen = true;
@@ -70,28 +72,36 @@ export default function Hero() {
       const cover = Math.max(r.width / set.w, r.height / set.h);
       const s = Math.min(Math.min(window.devicePixelRatio || 1, phone ? 2 : 1.25), 1 / cover);
       const w = Math.round(r.width * s), h = Math.round(r.height * s);
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = cw = w; canvas.height = ch = h; drawnIdx = -1; draw(shown); }
-    };
-    const nearest = (i: number) => {
-      if (loaded[i]) return i;
-      for (let d = 1; d < FRAME_COUNT; d++) {
-        if (i - d >= 0 && loaded[i - d]) return i - d;
-        if (i + d < FRAME_COUNT && loaded[i + d]) return i + d;
-      }
-      return -1;
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = cw = w; canvas.height = ch = h; drawnIdx = -1; drawnKey = -1; draw(shown); }
     };
     const want = (p: number) => Math.round(clamp(p, 0, 1) * (FRAME_COUNT - 1));
+    const paint = (img: ImageBitmap | HTMLImageElement) => {
+      const iw = img.width, ih = img.height;
+      const s = Math.max(cw / iw, ch / ih);
+      const w = iw * s, h = ih * s;
+      cx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+    };
+    /* Draw the film at position p. When the exact frame has not arrived yet (slow line), the two
+       nearest frames that have are blended, so the motion stays fluid instead of jumping. */
+    let drawnKey = -1;
     const draw = (p: number) => {
       if (!firstReady || !cw) return;
-      const i = nearest(want(p));
-      if (i < 0 || i === drawnIdx) return;
-      const img = frames[i];
-      const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-      const w = img.naturalWidth * s, h = img.naturalHeight * s;
-      cx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-      drawnIdx = i;
+      const x = clamp(p, 0, 1) * (FRAME_COUNT - 1);
+      let a = Math.floor(x), b = Math.ceil(x);
+      while (a >= 0 && !loaded[a]) a--;
+      while (b < FRAME_COUNT && !loaded[b]) b++;
+      if (a < 0 && b >= FRAME_COUNT) return;
+      let t = 0;
+      if (a < 0) a = b;
+      else if (b < FRAME_COUNT && b - a > 1) t = Math.round(((x - a) / (b - a)) * 24) / 24;   // a gap: blend across it
+      else if (b < FRAME_COUNT && x - a > 0.5) a = b;                                          // neighbours: nearest frame
+      if (t === 1) { a = b; t = 0; }
+      const key = t ? a * 100000 + b * 100 + Math.round(t * 24) : a;
+      if (key === drawnKey) return;
+      cx.globalAlpha = 1; paint(frames[a]);
+      if (t) { cx.globalAlpha = t; paint(frames[b]); cx.globalAlpha = 1; }
+      drawnKey = key; drawnIdx = t ? -1 : a;
     };
-
     // coarse-to-fine: frames 0, 30, 60, 90, 120 first, then every 15th, 8th, 4th, 2nd, then all
     let FIRST = 0, STEP4 = 0, STEP2 = 0;
     const ORDER: number[] = [];
@@ -116,6 +126,7 @@ export default function Hero() {
     };
 
     let alive = true;
+    const canBitmap = typeof createImageBitmap === 'function';
     const loadFrames = () => {
       const queue = ORDER.map((i, pos) => [i, pos < FIRST] as const);
       let active = 0, issued = 0, firstDone = 0, fails = 0, photosFirst = true;
@@ -126,18 +137,16 @@ export default function Hero() {
           if (net.slow && photosFirst && issued >= STEP4) break;          // slow line: let the photos through first
           const [i, first] = queue.shift()!;
           issued++;
-          const img = new Image();
-          img.decoding = 'async';
-          if (!first) img.fetchPriority = 'low';
           active++;
-          const done = (ok: boolean) => {
+          const done = (bmp: ImageBitmap | HTMLImageElement | null) => {
+            const ok = !!bmp;
             active--;
-            if (!alive) return;
+            if (!alive) { if (bmp && 'close' in bmp) bmp.close(); return; }
             if (ok) {
-              frames[i] = img; loaded[i] = 1; loadedCount++;
+              frames[i] = bmp!; loaded[i] = 1; loadedCount++;
               if (!firstReady && i === 0) { firstReady = true; sizeCanvas(); }
               const w = want(shown);
-              if (firstReady && Math.abs(i - w) < Math.abs(drawnIdx - w)) { drawnIdx = -1; draw(shown); }
+              if (firstReady && (drawnIdx < 0 || Math.abs(i - w) < Math.abs(drawnIdx - w))) { drawnKey = -1; draw(shown); }
             } else if (first) fails++;
             if (first && ++firstDone === FIRST) {
               if (!firstReady || fails > FIRST / 2) { stage.classList.add('video-failed'); setFailed(true); startPhotoWarm(); return; }
@@ -148,9 +157,19 @@ export default function Hero() {
             ringRef.current?.style.setProperty('--ld', String(Math.round(126 * (1 - Math.min(1, loadedCount / FRAME_COUNT)))));
             pump();
           };
-          img.onload = () => (img.decode ? img.decode() : Promise.resolve()).then(() => done(true), () => done(true));
-          img.onerror = () => done(false);
-          img.src = src(i);
+          /* Frame 0 doubles as the poster, so it comes through the same image request as the poster.
+             The rest arrive as raw data and are unpacked off the main thread. */
+          const viaImage = () => new Promise<ImageBitmap | HTMLImageElement>((res, rej) => {
+            const img = new Image();
+            img.decoding = 'async';
+            img.onload = () => (canBitmap ? createImageBitmap(img) : img.decode().then(() => img)).then(res, () => res(img));
+            img.onerror = rej;
+            img.src = src(i);
+          });
+          const viaData = () => fetch(src(i), { priority: first ? 'high' : 'low' } as RequestInit)
+            .then(r => { if (!r.ok) throw new Error(String(r.status)); return r.blob(); })
+            .then(blob => createImageBitmap(blob));
+          (i === 0 || !canBitmap ? viaImage() : viaData()).then(done, () => done(null));
         }
       };
       pump();
@@ -217,6 +236,7 @@ export default function Hero() {
 
     return () => {
       alive = false;
+      frames.forEach(f => { if (f && 'close' in f) f.close(); });
       disable();
       io.disconnect();
       gates.forEach(m => m.removeEventListener('change', apply));

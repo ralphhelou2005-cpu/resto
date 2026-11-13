@@ -63,6 +63,7 @@ Street address, opening hours, phone/email, Instagram (in `FACTS`, `src/data.ts`
 ## Performance notes (measured on Intel UHD 620, 1920x1080)
 
 - Hero film: canvas backing store matches the 1280px frames and the compositor scales it; default image smoothing. Settled scroll: 58 to 60 fps.
+- Hero frames arrive as raw data and are unpacked off the main thread (createImageBitmap), so the very first scroll is as smooth as later ones. Frames still on their way are bridged by blending the two nearest frames that have arrived, so the film never jumps on a slow line.
 - Photos appear sharp in one go (no blurred previews). They load in page order as soon as the hero film's first frames are in, so each one is usually ready before the visitor reaches it. On a slow line the film loads every 4th frame, lets the photos through, then fills in to every 2nd frame.
 - Slow connections (measured from the first hero frames) get every 2nd film frame and one photo at a time.
 - Sections lock with CSS `position: sticky`; reveals are CSS transitions on opacity/transform only.
